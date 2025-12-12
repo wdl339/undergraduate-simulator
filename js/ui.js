@@ -12,7 +12,7 @@ const UI = {
 
         // 绑定结果弹窗关闭
         document.getElementById('btn-result-close').addEventListener('click', () => {
-             document.getElementById('result-overlay').classList.add('hidden');
+             document.getElementById('result-overlay').classList.remove('active');
         });
     },
 
@@ -454,7 +454,7 @@ const UI = {
 
         document.getElementById('result-title').innerText = "事件结果";
         document.getElementById('result-body').innerHTML = html;
-        document.getElementById('result-overlay').classList.remove('hidden');
+        document.getElementById('result-overlay').classList.add('active');
     },
 
     renderCourseCard: function(container) {
