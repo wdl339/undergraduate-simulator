@@ -1,10 +1,16 @@
 // js/data.js
 
 const GameData = {
+    info: {
+        title: "本科生模拟器 Pro",
+        objective: "平衡学业与生活，达成毕业目标。",
+        author: "339摸鱼中"
+    },
     difficulties: {
-        normal: { id: "normal", name: "正常大学", baseCredit: 20, rankDiff: 0 },
-        project985: { id: "project985", name: "985高校", baseCredit: 24, rankDiff: 0.3 },
-        top2: { id: "top2", name: "清北学府", baseCredit: 28, rankDiff: 0.6 }
+        // reqCredits: 毕业所需总学分
+        normal: { id: "normal", name: "正常大学", baseCredit: 20, reqCredits: 160, rankDiff: 0 },
+        project985: { id: "project985", name: "985高校", baseCredit: 24, reqCredits: 170, rankDiff: 0.3 },
+        top2: { id: "top2", name: "清北学府", baseCredit: 28, reqCredits: 180, rankDiff: 0.6 }
     },
     personalities: {
         average: { id: "average", name: "平平无奇", statsModifier: 10 },
@@ -12,28 +18,39 @@ const GameData = {
         frail: { id: "frail", name: "弱不禁风", statsModifier: 5 }
     },
     attributes: [
-        // 个人状态 (category: 'basic')
-        { key: "knowledge", name: "知识水平", icon: "📚", max: 20, category: "basic" },
-        { key: "skills", name: "技能水平", icon: "💻", max: 20, category: "basic" },
-        { key: "physHealth", name: "身体健康", icon: "💪", max: 20, critical: 6, category: "basic" },
-        { key: "mentalHealth", name: "心理健康", icon: "🧠", max: 20, critical: 6, category: "basic" },
-        { key: "social", name: "社交水平", icon: "🤝", max: 20, category: "basic" },
-        { key: "money", name: "账户余额", icon: "💰", max: null, category: "basic" },
-        // 学业情况 (category: 'academic')
-        { key: "suTuo", name: "素拓", icon: "🌟", max: null, category: "academic" },
+        { key: "knowledge", name: "知识", icon: "📚", max: 20, category: "basic" },
+        { key: "skills", name: "技能", icon: "💻", max: 20, category: "basic" },
+        { key: "physHealth", name: "身健", icon: "💪", max: 20, critical: 6, category: "basic" },
+        { key: "mentalHealth", name: "心健", icon: "🧠", max: 20, critical: 6, category: "basic" },
+        { key: "social", name: "社交", icon: "🤝", max: 20, category: "basic" },
+        { key: "money", name: "余额", icon: "💰", max: null, category: "basic" },
+
+        // 学业属性
         { key: "gpa", name: "GPA", icon: "💯", max: 4.0, category: "academic" },
+        { key: "credits", name: "已修学分", icon: "🎓", max: null, category: "academic" }, // max将在逻辑中动态获取
+        { key: "suTuo", name: "素拓", icon: "🌟", max: null, category: "academic" },
         { key: "labor", name: "劳动", icon: "🧹", max: 20, category: "academic" }
     ],
     timeStructure: {
         totalPhases: 32,
-        subPhases: ["上学期-开学", "上学期-期中", "上学期-期末", "寒假", "下学期-开学", "下学期-期中", "下学期-期末", "暑假"]
+        // 标记哪些阶段是上课时间（用于算GPA分母），哪些是假期
+        subPhases: [
+            { name: "第一学期-开学", isClass: true },
+            { name: "第一学期-期中", isClass: true },
+            { name: "第一学期-期末", isClass: true },
+            { name: "寒假", isClass: false },
+            { name: "第二学期-开学", isClass: true },
+            { name: "第二学期-期中", isClass: true },
+            { name: "第二学期-期末", isClass: true },
+            { name: "暑假", isClass: false }
+        ]
     },
-    // === 新增：毕业目标 ===
+    // ... (goals, shopItems, projects, events 保持不变，可复用之前的) ...
     goals: {
         gradSchool: {
             id: 'gradSchool', name: '保研深造',
-            req: { knowledge: 16, skills: 10, gpa: 3.5, labor: 20 },
-            rankReq: 0.15, // 排名需在前 15% (不同难度会调整)
+            req: { knowledge: 16, skills: 10, gpa: 3.6, labor: 20 },
+            rankReq: 0.15,
             desc: "成为学术大佬，免试攻读研究生。"
         },
         job: {
@@ -43,7 +60,6 @@ const GameData = {
             desc: "积累实习经验，毕业即拿高薪Offer。"
         }
     },
-    // === 新增：商店物品 ===
     shopItems: [
         { id: 'book', name: '专业书籍', cost: 200, type: 'consumable', effect: { knowledge: 1.5 }, desc: "知识+1.5" },
         { id: 'gym_card', name: '健身卡', cost: 500, type: 'consumable', effect: { physHealth: 3, mentalHealth: 1 }, desc: "身健+3, 心健+1" },
@@ -51,7 +67,6 @@ const GameData = {
         { id: 'coffee_machine', name: '咖啡机', cost: 1500, type: 'permanent', effect: { energyMax: 20 }, desc: "精力上限+20 (永久, 限购1次)" },
         { id: 'laptop', name: '高性能笔记本', cost: 3000, type: 'permanent', effect: { skillBonus: 0.2 }, desc: "实习效率提升20% (永久, 限购1次)" }
     ],
-    // === 新增：短期项目 ===
     projects: [
         {
             id: 'competition', name: '学科竞赛', duration: 3,
@@ -87,7 +102,22 @@ const GameData = {
             text: "室友邀请你通宵开黑，你决定：",
             options: [
                 { text: "加入他们", effect: { social: 2, physHealth: -2, knowledge: -0.5 } },
-                { text: "拒绝并睡觉", effect: { mentalHealth: -0.5, physHealth: 1 } }
+                { text: "拒绝并睡觉", effect: { mentalHealth: -0.5, physHealth: 1 } },
+                { text: "起来卷高数", effect: { knowledge: 1, physHealth: -1, social: -1 } }
+            ]
+        },
+        {
+            text: "突发流感，你感觉喉咙不舒服：",
+            options: [
+                { text: "立刻去校医院", effect: { money: -100, physHealth: 1 } },
+                { text: "硬抗", effect: { physHealth: -3, mentalHealth: -1 } }
+            ]
+        },
+        {
+            text: "路上捡到一张校园卡：",
+            options: [
+                { text: "想办法还给失主", effect: { social: 1, suTuo: 0.5 } },
+                { text: "不管它", effect: {} } // 无事发生
             ]
         }
     ]

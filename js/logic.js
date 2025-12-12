@@ -9,7 +9,8 @@ const GameState = {
             currentSemesterCredits: 0,
             totalCredits: 0,
             courses: [],
-            studyEffort: 0
+            studyEffortAcc: 0, // 本学期累积学习精力
+            classPhasesPassed: 0 // 本学期已经过的上课阶段数
         },
         time: { phaseIdx: 0, year: 1, semester: 1, isHoliday: false },
         logs: [],
@@ -22,26 +23,26 @@ const GameState = {
 
     turnData: {
         pendingTasks: [],
-        tempEffects: {}
     },
 
     init: function(diffKey, persKey) {
-        // 重置状态
+        this.player.difficulty = GameData.difficulties[diffKey];
+        this.player.personality = GameData.personalities[persKey];
+
+        // 重置
         this.player.stats = {};
-        this.player.academics = { currentSemesterCredits: 0, totalCredits: 0, courses: [], studyEffort: 0 };
+        this.player.academics = { currentSemesterCredits: 0, totalCredits: 0, courses: [], studyEffortAcc: 0, classPhasesPassed: 0 };
         this.player.time = { phaseIdx: -1, year: 1, semester: 1, isHoliday: false };
         this.player.logs = [];
         this.player.flags = { energyMax: 100, skillBonus: 1.0, boughtItems: [] };
         this.player.activeProject = null;
-        this.player.currentGoal= 'gradSchool';
+        this.player.currentGoal = 'gradSchool';
         this.player.consecutiveBankrupt = 0;
 
-        this.player.difficulty = GameData.difficulties[diffKey];
-        this.player.personality = GameData.personalities[persKey];
-
         GameData.attributes.forEach(attr => {
-            if (attr.key === 'money') this.player.stats[attr.key] = 2000;
+            if (attr.key === 'money') this.player.stats[attr.key] = 3000; // 稍微多给点初始资金
             else if (['gpa','suTuo','labor'].includes(attr.key)) this.player.stats[attr.key] = 0;
+            else if (attr.key === 'credits') this.player.stats[attr.key] = 0;
             else this.player.stats[attr.key] = this.player.personality.statsModifier;
         });
 
@@ -64,99 +65,239 @@ const GameState = {
         const phaseInYear = idx % 8;
         this.player.time.year = Math.floor(idx / 8) + 1;
         this.player.time.semester = phaseInYear < 4 ? 1 : 2;
-        const subPhaseIndex = phaseInYear % 4;
-        this.player.time.isHoliday = (subPhaseIndex === 3);
 
-        // 新学年重置
+        const subPhaseObj = GameData.timeStructure.subPhases[phaseInYear];
+        this.player.time.isHoliday = !subPhaseObj.isClass;
+
+        // 新学期/新学年 初始化
+        if (phaseInYear === 0 || phaseInYear === 4) {
+            // 新学期开始，重置GPA相关累积
+            this.player.academics.studyEffortAcc = 0;
+            this.player.academics.classPhasesPassed = 0;
+        }
         if (phaseInYear === 0 && this.player.time.year > 1) {
             this.rankAndScholarship();
             this.player.stats.suTuo = 0;
             this.addLog(`📅 新学年开始，素拓分已重置。`);
         }
 
-        // 推进项目
         this.processActiveProject();
-
-        // 生成任务
-        this.generateTasks(subPhaseIndex);
-
-        // 刷新UI
+        this.generateTasks(phaseInYear);
         UI.updateAll();
     },
 
-    generateTasks: function(subIdx) {
+    generateTasks: function(phaseInYear) {
         this.turnData.pendingTasks = [];
-        if (subIdx === 0) {
+        const isStartOfSemester = (phaseInYear === 0 || phaseInYear === 4);
+        const isEndOfSemester = (phaseInYear === 2 || phaseInYear === 6);
+
+        // 开学：选课 & 生活费
+        if (isStartOfSemester) {
             this.player.stats.money += 2000;
             this.addLog("💰 获得生活费 2000元。");
-            this.player.academics.currentSemesterCredits = this.player.difficulty.baseCredit;
-            this.player.academics.studyEffort = 0;
+
+            // 智能推荐学分： (总需 - 已修) / 剩余学期数
+            const remainingCredits = Math.max(0, this.player.difficulty.reqCredits - this.player.academics.totalCredits);
+            const totalSemesters = 8;
+            const passedSemesters = (this.player.time.year - 1) * 2 + (this.player.time.semester - 1);
+            const remainingSemesters = totalSemesters - passedSemesters;
+
+            let rec = remainingSemesters > 0 ? Math.ceil(remainingCredits / remainingSemesters) : remainingCredits;
+            rec = Math.min(40, Math.max(10, rec)); // 限制在10-40之间
+
+            this.player.academics.currentSemesterCredits = rec;
             this.turnData.pendingTasks.push('course_selection');
         }
+
         this.turnData.pendingTasks.push('energy_allocation');
         this.turnData.pendingTasks.push('random_event');
-        if (subIdx === 2) {
+
+        if (isEndOfSemester) {
             this.turnData.pendingTasks.push('final_exam');
         }
     },
 
-    confirmEnergy: function(alloc) {
+    // === 精力分配与预测 ===
+
+    // 供UI调用的预测函数 (不改变实际属性)
+    getEnergyPreview: function(alloc) {
         const p = this.player.stats;
         const flags = this.player.flags;
+        let changes = { knowledge:0, skills:0, physHealth:0, mentalHealth:0, social:0, money:0 };
+        let warnings = [];
 
+        // 1. 收益
+        changes.knowledge += (alloc.study / 20) * 0.5;
+        changes.skills += (alloc.intern / 20) * 0.5 * flags.skillBonus;
+        if (alloc.intern > 30) {
+             changes.money += 300;
+        }
+        const restGain = (alloc.rest / 20) * 0.8;
+        changes.physHealth += restGain;
+        changes.mentalHealth += restGain;
+        changes.social += (alloc.social / 20) * 0.5;
+
+        // 2. 消耗与惩罚
+        // 项目消耗
+        if (this.player.activeProject) {
+            const proj = GameData.projects.find(pr => pr.id === this.player.activeProject.id);
+            for (let k in proj.costPerTurn) {
+                if (changes[k] === undefined) changes[k] = 0;
+                changes[k] -= proj.costPerTurn[k];
+            }
+        }
+
+        // 溢出惩罚
         let total = alloc.study + alloc.rest + alloc.intern + alloc.social;
         let overflow = Math.max(0, total - flags.energyMax);
-        let changes = {};
-
-        // 结算各项
-        let knowGain = (alloc.study / 20) * 0.5;
-        this.applyChange(changes, 'knowledge', knowGain);
-        this.player.academics.studyEffort += alloc.study;
-
-        let skillGain = (alloc.intern / 20) * 0.5 * flags.skillBonus;
-        this.applyChange(changes, 'skills', skillGain);
-        if (alloc.intern > 30) {
-            this.player.stats.labor += 1;
-            this.applyChange(changes, 'money', 300);
-        }
-
-        let healthGain = (alloc.rest / 20) * 0.8;
-        this.applyChange(changes, 'physHealth', healthGain);
-        this.applyChange(changes, 'mentalHealth', healthGain);
-
-        let socialGain = (alloc.social / 20) * 0.5;
-        this.applyChange(changes, 'social', socialGain);
-
-        // 惩罚
         if (overflow > 0) {
             let penalty = overflow / 10;
-            this.applyChange(changes, 'physHealth', -penalty);
-            this.applyChange(changes, 'mentalHealth', -penalty * 0.5);
-            this.addLog(`⚠️ 精力透支 ${overflow}%，身体受损！`);
+            changes.physHealth -= penalty;
+            changes.mentalHealth -= penalty * 0.5;
+            warnings.push(`精力透支 ${overflow}%, 健康大幅受损`);
         }
-        if (p.physHealth < 6 || p.mentalHealth < 6) {
-            this.applyChange(changes, 'knowledge', -1);
-            this.applyChange(changes, 'skills', -1);
-            this.addLog("⚠️ 身心状况极差，效率大幅下降！");
+
+        // 低健康惩罚预警
+        // 预测后的血量
+        let predPhys = p.physHealth + changes.physHealth;
+        let predMent = p.mentalHealth + changes.mentalHealth;
+        if (predPhys < 6 || predMent < 6) {
+            changes.knowledge -= 1;
+            changes.skills -= 1;
+            warnings.push("身心状况极差，学习效率下降");
+        }
+
+        return { changes, warnings, total, overflow };
+    },
+
+    // 确认精力分配
+    confirmEnergy: function(alloc) {
+        // 复用预测逻辑来计算数值
+        const preview = this.getEnergyPreview(alloc);
+        const chg = preview.changes;
+
+        for (let k in chg) {
+            this.applyChange(null, k, chg[k]);
+        }
+
+        // 记录本学期学习精力 (仅当是非假期时)
+        if (!this.player.time.isHoliday) {
+            this.player.academics.studyEffortAcc += alloc.study;
+            this.player.academics.classPhasesPassed++;
+        }
+
+        // 增加劳动学时 (实际逻辑)
+        if (alloc.intern > 30) this.player.stats.labor += 1;
+
+        if (preview.warnings.length > 0) {
+            this.addLog(`⚠️ ${preview.warnings.join('; ')}`);
         }
 
         this.completeTask('energy_allocation');
-        UI.showFloatingEffects(changes);
     },
 
-    applyChange: function(logObj, key, val) {
-        if (val === 0) return;
+    // === GPA 预测与计算 ===
+
+    // 获取GPA预测范围 {min, max, avg}
+    getGPAPrediction: function(currentStudyInput) {
+        const ac = this.player.academics;
+        const credits = ac.currentSemesterCredits;
+        if (credits <= 0) return { min: 0, max: 0, avg: 0 };
+
+        // 假设当前阶段投入 currentStudyInput
+        let projectedEffort = ac.studyEffortAcc;
+        let projectedPhases = ac.classPhasesPassed;
+
+        if (!this.player.time.isHoliday) {
+            projectedEffort += currentStudyInput;
+            projectedPhases += 1;
+        }
+
+        // 防止除以0
+        let avgEffort = projectedPhases > 0 ? (projectedEffort / projectedPhases) : 0;
+
+        // 核心公式：
+        // 知识分：满分3.0 (20知识)
+        const knowledgeBase = this.player.stats.knowledge * 0.15;
+
+        // 努力分：
+        // 假设标准努力是：每学分对应 2.5 精力/每阶段
+        // 例如 20学分 -> 每阶段投入 50 精力 -> 努力分 1.0 (满分)
+        const requiredEffortPerPhase = credits * 2.5;
+        let effortScore = 0;
+        if (requiredEffortPerPhase > 0) {
+            effortScore = (avgEffort / requiredEffortPerPhase) * 1.5; // 上限1.5
+        }
+
+        let baseGPA = knowledgeBase + effortScore - 0.5;
+        // 随机浮动 +/- 0.6
+        return {
+            min: Math.max(0, Math.min(4.0, baseGPA - 0.6)),
+            max: Math.max(0, Math.min(4.0, baseGPA + 0.6)),
+            avg: Math.max(0, Math.min(4.0, baseGPA))
+        };
+    },
+
+    calculateSemesterGPA: function() {
+        // 不传参调用 getGPAPrediction 会使用当前的累积值（不含本回合，因为本回合已经结算进去了）
+        // 但这里我们需要最后一次结算
+        const ac = this.player.academics;
+        // 平均努力
+        let avgEffort = ac.classPhasesPassed > 0 ? (ac.studyEffortAcc / ac.classPhasesPassed) : 0;
+
+        const knowledgeBase = this.player.stats.knowledge * 0.15;
+        const requiredEffortPerPhase = ac.currentSemesterCredits * 2.5;
+        let effortScore = 0;
+        if (requiredEffortPerPhase > 0) effortScore = (avgEffort / requiredEffortPerPhase) * 1.5;
+
+        let finalGPA = knowledgeBase + effortScore - 0.5 + (Math.random() * 1.2 - 0.6); // -0.6 ~ +0.6
+        finalGPA = parseFloat(Math.max(0, Math.min(4.0, finalGPA)).toFixed(2));
+
+        // 记录
+        ac.courses.push({ credits: ac.currentSemesterCredits, gp: finalGPA });
+        ac.totalCredits += ac.currentSemesterCredits;
+
+        // 更新总GPA
+        let totalScore = 0; let totalCreds = 0;
+        ac.courses.forEach(c => { totalScore += c.gp * c.credits; totalCreds += c.credits; });
+        this.player.stats.gpa = parseFloat((totalScore / totalCreds).toFixed(2));
+        this.player.stats.credits = ac.totalCredits; // 同步给UI显示
+
+        this.addLog(`📝 学期结束，平均努力: ${avgEffort.toFixed(1)}，绩点: ${finalGPA}`);
+        this.completeTask('final_exam');
+    },
+
+    // === 事件与任务 ===
+
+    resolveEvent: function(eff) {
+        let changes = {};
+        for(let k in eff) {
+            this.applyChange(changes, k, eff[k]);
+        }
+        this.completeTask('random_event');
+        return changes; // 返回变动给UI显示
+    },
+
+   applyChange: function(logObj, key, val) {
+        if (!val) return;
         this.player.stats[key] += val;
 
         const attr = GameData.attributes.find(a => a.key === key);
         if (attr && attr.max) {
             this.player.stats[key] = Math.min(attr.max, Math.max(0, this.player.stats[key]));
         }
+        if (logObj) logObj[key] = val;
+    },
 
-        if (logObj) {
-            if (!logObj[key]) logObj[key] = 0;
-            logObj[key] += val;
-        }
+    completeTask: function(t) {
+        this.turnData.pendingTasks = this.turnData.pendingTasks.filter(x => x !== t);
+        UI.updateAll();
+    },
+
+    confirmCourseSelection: function(c) {
+        this.player.academics.currentSemesterCredits = parseInt(c);
+        this.addLog(`📚 选课学分：${c}`);
+        this.completeTask('course_selection');
     },
 
     startProject: function(projId) {
@@ -257,13 +398,17 @@ const GameState = {
         return false;
     },
 
+    // 结局判断增加学分
     checkGoodEnding: function() {
         const g = GameData.goals[this.player.currentGoal];
         const s = this.player.stats;
-        for (let k in g.req) {
-            if (s[k] < g.req[k]) return false;
-        }
+        // 1. 毕业硬性门槛
+        if (s.credits < this.player.difficulty.reqCredits) return false;
+
+        // 2. 目标属性
+        for (let k in g.req) if (s[k] < g.req[k]) return false;
         if (g.rankReq && (this.player.rank / 100) > g.rankReq) return false;
+
         return true;
     },
 
@@ -304,60 +449,18 @@ const GameState = {
         UI.showEndingScreen(title, desc, isGood);
     },
 
-    calculateSemesterGPA: function() {
-        const knowledgeBase = this.player.stats.knowledge * 0.15;
-        const credits = this.player.academics.currentSemesterCredits;
-        const totalEffort = this.player.academics.studyEffort;
-
-        let effortScore = 0;
-        if (credits > 0) effortScore = (totalEffort / (credits * 8)) * 3.0;
-
-        let semesterGP = knowledgeBase + effortScore - 0.5 + (Math.random() * 0.6);
-        semesterGP = Math.max(0, Math.min(4.0, semesterGP));
-
-        this.player.academics.courses.push({ credits: credits, gp: semesterGP });
-        this.player.academics.totalCredits += credits;
-
-        let totalScore = 0; let totalCreds = 0;
-        this.player.academics.courses.forEach(c => { totalScore += c.gp * c.credits; totalCreds += c.credits; });
-        this.player.stats.gpa = parseFloat((totalScore / totalCreds).toFixed(2));
-
-        this.addLog(`📝 学期绩点：${semesterGP.toFixed(2)}，总GPA：${this.player.stats.gpa}`);
-        this.completeTask('final_exam');
-    },
-
-    confirmCourseSelection: function(c) {
-        this.player.academics.currentSemesterCredits = parseInt(c);
-        this.addLog(`📚 选课学分：${c}`);
-        this.completeTask('course_selection');
-    },
-
-    resolveEvent: function(eff) {
-        let changes = {};
-        for(let k in eff) this.applyChange(changes, k, eff[k]);
-        UI.showFloatingEffects(changes);
-        this.completeTask('random_event');
-    },
-
-    completeTask: function(t) {
-        this.turnData.pendingTasks = this.turnData.pendingTasks.filter(x => x !== t);
-        UI.updateAll();
-    },
-
-    // 之前遗漏的关键函数！
+    // === 辅助 ===
     addLog: function(msg) {
         const t = this.player.time;
-        // 计算当前阶段名称 (防止-1的情况)
-        const idx = Math.max(0, t.phaseIdx);
-        const subPhaseName = GameData.timeStructure.subPhases[idx % 8];
+        const subPhaseName = GameData.timeStructure.subPhases[Math.max(0, t.phaseIdx) % 8].name;
         const timeStr = `第${t.year}年 | ${subPhaseName}`;
         this.player.logs.unshift({ time: timeStr, msg: msg });
     },
 
     getStat: function(k) { return this.player.stats[k]; },
-
     getStatPercent: function(k) {
         const attr = GameData.attributes.find(a => a.key === k);
+        if (!attr.max) return 0;
         return Math.min(100, Math.max(0, (this.player.stats[k] / attr.max) * 100));
-    }
+    },
 };
