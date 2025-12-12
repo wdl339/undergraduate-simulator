@@ -42,28 +42,55 @@
         <div class="game-container">
             <!-- 左侧：属性栏 -->
             <div class="sidebar" id="sidebar">
+                <!-- 顶部固定信息 -->
                 <div class="player-info">
                     <p><strong>大学：</strong><span id="display-difficulty"></span></p>
                     <p><strong>性格：</strong><span id="display-personality"></span></p>
                 </div>
-                <div id="attributes-list">
-                    <!-- JS动态生成 -->
+
+                <!-- 分区1：个人状态 -->
+                <div class="sidebar-section-title">个人状态</div>
+                <div id="basic-stats-list">
+                    <!-- JS 生成：知识、技能、健康、社交、金钱 -->
+                </div>
+
+                <!-- 分区2：学业情况 -->
+                <div class="sidebar-section-title">学业情况</div>
+                <div id="academic-stats-list">
+                    <!-- JS 生成：GPA、素拓、劳动、已修学分 -->
                 </div>
             </div>
 
-            <!-- 右侧：待开发区域 -->
-            <div class="main-area" id="main-area">
-                <h2>这里是校园（待开发...）</h2>
-            </div>
-        </div>
-    </div>
+            <!-- 右侧：主操作区 -->
+            <div class="main-area">
 
-    <!-- 模态框 (用于显示详情) -->
-    <div id="modal-overlay" class="modal-overlay hidden">
-        <div class="modal">
-            <h3 id="modal-title">标题</h3>
-            <p id="modal-body">内容</p>
-            <div class="modal-tip">点击任意处关闭</div>
+                <!-- 头部：时间与Tab -->
+                <div class="game-header">
+                    <div class="time-display" id="game-time-display">第1年 | 第一学期-开学</div>
+                    <div class="game-tabs">
+                        <button id="tab-tasks" class="active">待办事项</button>
+                        <button id="tab-logs">生涯记录</button>
+                    </div>
+                </div>
+
+                <!-- 内容区：任务卡片 -->
+                <div id="view-tasks" class="scroll-content">
+                    <div id="task-container">
+                        <!-- JS动态插入卡片 -->
+                    </div>
+                </div>
+
+                <!-- 内容区：日志 -->
+                <div id="view-logs" class="scroll-content hidden">
+                    <div id="log-list"></div>
+                </div>
+
+                <!-- 底部：推进按钮 -->
+                <div class="game-footer">
+                    <button id="btn-next-phase" class="btn-primary" onclick="GameState.nextPhase()" disabled>进入下一阶段 >></button>
+                </div>
+
+            </div>
         </div>
     </div>
 
