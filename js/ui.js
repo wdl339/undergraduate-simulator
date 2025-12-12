@@ -153,7 +153,7 @@ const UI = {
                     <div class="list-item-left">
                         <strong>${p.name} <span style="font-size:12px; font-weight:normal; color:#999">持续${p.duration}阶段</span></strong>
                         <div style="margin:5px 0">${reqHtml}</div>
-                        <p>每回合消耗: ${costDesc}</p>
+                        <p>每阶段消耗: ${costDesc}</p>
                         <p style="margin-top:4px; color:#64748b">${p.desc}</p>
                     </div>
                     <button class="btn-primary" style="padding:6px 12px; font-size:12px;"
@@ -264,6 +264,10 @@ const UI = {
                 排名: Top ${GameState.player.rank}% / ${goal.rankReq*100}% ${met?'✔':''}
             </div>`;
         }
+        const met = GameState.player.stats.credits >= GameState.player.difficulty.reqCredits;
+        reqHtml += `<div style="font-size:12px; color:${met?'var(--success)':'#94a3b8'}">
+            学分: ${GameState.player.stats.credits} / ${GameState.player.difficulty.reqCredits} ${met?'✔':''}
+        </div>`;
 
         document.getElementById('goal-tracker').innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">

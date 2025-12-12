@@ -402,10 +402,7 @@ const GameState = {
     checkGoodEnding: function() {
         const g = GameData.goals[this.player.currentGoal];
         const s = this.player.stats;
-        // 1. 毕业硬性门槛
         if (s.credits < this.player.difficulty.reqCredits) return false;
-
-        // 2. 目标属性
         for (let k in g.req) if (s[k] < g.req[k]) return false;
         if (g.rankReq && (this.player.rank / 100) > g.rankReq) return false;
 
