@@ -2,72 +2,100 @@
 
 const GameData = {
     info: {
-        title: "本科生模拟器",
-        objective: "目标：度过美好的大学生活，保持身心健康，刷高GPA，积累素拓与劳动学时。",
+        title: "本科生模拟器 Pro",
+        objective: "保持身心健康，平衡学业与生活，达成你的毕业目标。",
         author: "339摸鱼中"
     },
     difficulties: {
-        normal: { id: "normal", name: "正常大学", desc: "学分安排合理，保研率 10%", multiplier: 1.0, baseCredit: 20 },
-        project985: { id: "project985", name: "985高校", desc: "课程紧凑，大佬云集，保研率 30%", multiplier: 1.2, baseCredit: 24 },
-        top2: { id: "top2", name: "清北学府", desc: "地狱难度，内卷之王，保研率 40%", multiplier: 1.5, baseCredit: 28 }
+        normal: { id: "normal", name: "正常大学", baseCredit: 20, rankDiff: 0 },
+        project985: { id: "project985", name: "985高校", baseCredit: 24, rankDiff: 0.3 }, // rankDiff用于模拟同学水平
+        top2: { id: "top2", name: "清北学府", baseCredit: 28, rankDiff: 0.6 }
     },
     personalities: {
-        average: { id: "average", name: "平平无奇", desc: "均衡发展", statsModifier: 10 },
-        gifted: { id: "gifted", name: "天赋异禀", desc: "初始能力较高", statsModifier: 15 },
-        frail: { id: "frail", name: "弱不禁风", desc: "体质较差", statsModifier: 5 }
+        average: { id: "average", name: "平平无奇", statsModifier: 10 },
+        gifted: { id: "gifted", name: "天赋异禀", statsModifier: 15 },
+        frail: { id: "frail", name: "弱不禁风", statsModifier: 5 }
     },
-    // 属性定义更新
     attributes: [
-        // === 个人状态 (category: 'basic') ===
-        { key: "knowledge", name: "知识水平", icon: "📚", max: 20, desc: "决定考试成绩上限。", category: "basic" },
-        { key: "skills", name: "技能水平", icon: "💻", max: 20, desc: "影响实习产出与科研。", category: "basic" },
-        { key: "physHealth", name: "身体健康", icon: "💪", max: 20, desc: "过低会每回合扣除属性。", critical: 6, category: "basic" },
-        { key: "mentalHealth", name: "心理健康", icon: "🧠", max: 20, desc: "过低会每回合扣除属性。", critical: 6, category: "basic" },
-        { key: "social", name: "社交水平", icon: "🤝", max: 20, desc: "影响人脉与机会。", category: "basic" },
-        { key: "money", name: "钱包余额", icon: "💰", max: null, desc: "生活经费。", category: "basic" },
-
-        // === 学业情况 (category: 'academic') ===
-        { key: "gpa", name: "GPA", icon: "💯", max: 4.0, desc: "加权平均分，保研核心指标。", category: "academic" },
-        { key: "suTuo", name: "素拓分", icon: "🌟", max: null, desc: "每学年重置，奖学金评定依据。", category: "academic" },
-        { key: "labor", name: "劳动学时", icon: "🧹", max: 20, desc: "毕业硬性指标，需满20学时。", category: "academic" }
-        // 注意：“已修学分”不是一个基础属性，它是一个统计值，我们在UI里单独处理
+        // 个人状态 (category: 'basic')
+        { key: "knowledge", name: "知识", icon: "📚", max: 20, category: "basic" },
+        { key: "skills", name: "技能", icon: "💻", max: 20, category: "basic" },
+        { key: "physHealth", name: "身健", icon: "💪", max: 20, critical: 6, category: "basic" }, // 名字缩短以节省空间
+        { key: "mentalHealth", name: "心健", icon: "🧠", max: 20, critical: 6, category: "basic" },
+        { key: "social", name: "社交", icon: "🤝", max: 20, category: "basic" },
+        { key: "money", name: "余额", icon: "💰", max: null, category: "basic" },
+        // 学业情况 (category: 'academic')
+        { key: "gpa", name: "GPA", icon: "💯", max: 4.0, category: "academic" },
+        { key: "suTuo", name: "素拓", icon: "🌟", max: null, category: "academic" },
+        { key: "labor", name: "劳动", icon: "🧹", max: 20, category: "academic" }
     ],
-    // 时间配置
     timeStructure: {
-        totalPhases: 32, // 4年 * 8阶段
-        phasesPerYear: 8,
-        phaseNames: ["大一", "大二", "大三", "大四"],
-        subPhases: [
-            "第一学期-开学", "第一学期-期中", "第一学期-期末", "寒假",
-            "第二学期-开学", "第二学期-期中", "第二学期-期末", "暑假"
-        ]
+        totalPhases: 32,
+        subPhases: ["大一上-开学", "大一上-期中", "大一上-期末", "大一-寒假", "大一下-开学", "大一下-期中", "大一下-期末", "大一-暑假"]
+        // 简化逻辑：只定义一套，年份动态拼
     },
-    // 随机情境题库 (示例)
+    // === 新增：毕业目标 ===
+    goals: {
+        gradSchool: {
+            id: 'gradSchool', name: '保研深造',
+            req: { knowledge: 16, skills: 10, gpa: 3.5, labor: 20 },
+            rankReq: 0.15, // 排名需在前 15% (不同难度会调整)
+            desc: "成为学术大佬，免试攻读研究生。"
+        },
+        job: {
+            id: 'job', name: '直接就业',
+            req: { skills: 16, social: 10, labor: 20 },
+            rankReq: null,
+            desc: "积累实习经验，毕业即拿高薪Offer。"
+        }
+    },
+    // === 新增：商店物品 ===
+    shopItems: [
+        { id: 'book', name: '专业书籍', cost: 200, type: 'consumable', effect: { knowledge: 1.5 }, desc: "知识+1.5" },
+        { id: 'gym_card', name: '健身卡', cost: 500, type: 'consumable', effect: { physHealth: 3, mentalHealth: 1 }, desc: "身健+3, 心健+1" },
+        { id: 'consulting', name: '心理咨询', cost: 800, type: 'consumable', effect: { mentalHealth: 5 }, desc: "心健+5 (救命用)" },
+        { id: 'coffee_machine', name: '咖啡机', cost: 1500, type: 'permanent', effect: { energyMax: 20 }, desc: "精力上限+20 (永久, 限购1次)" },
+        { id: 'laptop', name: '高性能笔电', cost: 3000, type: 'permanent', effect: { skillBonus: 0.2 }, desc: "实习效率提升20% (永久, 限购1次)" }
+    ],
+    // === 新增：短期项目 ===
+    projects: [
+        {
+            id: 'competition', name: '学科竞赛', duration: 3,
+            req: { knowledge: 12 },
+            costPerTurn: { mentalHealth: 0.5 },
+            reward: { suTuo: 2, skills: 1, knowledge: 1 },
+            desc: "参加全国大学生竞赛，需持续投入精力。"
+        },
+        {
+            id: 'research', name: '进组科研', duration: 4,
+            req: { knowledge: 15, gpa: 3.3 },
+            costPerTurn: { physHealth: 0.5 },
+            reward: { knowledge: 3, skills: 2, suTuo: 1 },
+            desc: "给导师打工，既累又有收获。"
+        },
+        {
+            id: 'dating', name: '谈恋爱', duration: 5,
+            req: { social: 12, money: 1000 },
+            costPerTurn: { money: 200},
+            reward: { mentalHealth: 5, social: 3 },
+            desc: "甜甜的恋爱，消耗金钱但治愈心灵。"
+        },
+        {
+            id: 'internship', name: '高压实习', duration: 4,
+            req: { skills: 10 },
+            costPerTurn: { physHealth: 1 },
+            reward: { money: 3000, skills: 3 },
+            desc: "去大厂996，累但搞钱快。"
+        }
+    ],
+    // 随机事件 (简化版，保留之前逻辑即可，这里只放一个示例)
     events: [
         {
-            text: "室友半夜两点还在打游戏大喊大叫，你选择：",
+            text: "室友邀请你通宵开黑，你决定：",
             options: [
-                { text: "加入他们", effect: { social: 2, physHealth: -2, knowledge: -1 } },
-                { text: "戴耳塞睡觉", effect: { mentalHealth: -1, physHealth: 1 } },
-                { text: "不仅不睡，还起来卷高数", effect: { knowledge: 2, physHealth: -2, mentalHealth: -1, social: -1 } }
+                { text: "加入他们", effect: { social: 2, physHealth: -2, knowledge: -0.5 } },
+                { text: "拒绝并睡觉", effect: { mentalHealth: -0.5, physHealth: 1 } }
             ]
-        },
-        {
-            text: "某社团招新，学长热情地向你推销，你决定：",
-            options: [
-                { text: "参加并积极干活", effect: { suTuo: 2, social: 1, money: -200 } },
-                { text: "参加但在里面划水", effect: { suTuo: 0.5, social: 1 } },
-                { text: "拒绝，我要学习", effect: { knowledge: 1, social: -1 } }
-            ]
-        },
-        {
-            text: "食堂推出了这一季的新品‘辣椒炒月饼’，只要5元，你：",
-            options: [
-                { text: "尝尝鲜", effect: { money: -5, physHealth: -2, mentalHealth: 1 } },
-                { text: "点外卖（30元）", effect: { money: -30, physHealth: 1 } },
-                { text: "不吃了，减肥", effect: { physHealth: -1, mentalHealth: -1 } }
-            ]
-        },
-        // 可继续扩展...
+        }
     ]
 };

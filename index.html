@@ -3,100 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>本科生模拟器</title>
+    <title>本科生模拟器 Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="screen">
 
-    <!-- 1. 介绍界面 -->
-    <div id="screen-intro" class="screen">
-        <div class="intro-content">
-            <h1 id="game-title">标题加载中...</h1>
-            <p id="game-objective" class="desc">目标加载中...</p>
-            <button class="btn-primary" onclick="UI.showSetup()">开始新的生涯</button>
-            <p id="game-author" class="author"></p>
+        <!-- 介绍与设置 (保持在一个容器，通过JS切换) -->
+        <div id="screen-intro" class="intro-screen">
+            <h1 style="color:var(--primary)">🎓 本科生模拟器 Pro</h1>
+            <p style="color:#666; max-width:500px">在这里，你要平衡学业、科研、实习与恋爱。<br>你的每一个决定，都关乎你能否顺利毕业，以及未来的去向。</p>
+            <button class="btn-primary" onclick="UI.showSetup()" style="margin-top:30px">开始新生报到</button>
         </div>
-    </div>
 
-    <!-- 2. 设置界面 -->
-    <div id="screen-setup" class="screen hidden">
-        <div class="setup-content">
-            <h2>入学登记</h2>
-
+        <div id="screen-setup" class="intro-screen hidden">
+            <h2>📝 新生档案登记</h2>
             <div class="form-group">
-                <label>选择你的大学（难度）：</label>
+                <label>目标院校</label><br>
                 <select id="select-difficulty"></select>
             </div>
-
             <div class="form-group">
-                <label>选择你的性格（初始属性）：</label>
+                <label>入学性格</label><br>
                 <select id="select-personality"></select>
             </div>
-
-            <button class="btn-primary" onclick="UI.startGame()">办理入学手续</button>
+            <button class="btn-primary" onclick="UI.startGame()">领取学生证</button>
         </div>
-    </div>
 
-    <!-- 3. 真正游戏界面 -->
-    <div id="screen-game" class="screen hidden">
-        <div class="game-container">
-            <!-- 左侧：属性栏 -->
-            <div class="sidebar" id="sidebar">
-                <!-- 顶部固定信息 -->
-                <div class="player-info">
-                    <p><strong>大学：</strong><span id="display-difficulty"></span></p>
-                    <p><strong>性格：</strong><span id="display-personality"></span></p>
-                </div>
-
-                <!-- 分区1：个人状态 -->
+        <!-- 真正的游戏界面 -->
+        <div id="screen-game" class="hidden" style="display:flex; width:100%; height:100%">
+            <!-- 左侧：紧凑属性栏 -->
+            <div class="sidebar">
                 <div class="sidebar-section-title">个人状态</div>
-                <div id="basic-stats-list">
-                    <!-- JS 生成：知识、技能、健康、社交、金钱 -->
-                </div>
+                <div id="basic-stats-list"></div>
 
-                <!-- 分区2：学业情况 -->
-                <div class="sidebar-section-title">学业情况</div>
-                <div id="academic-stats-list">
-                    <!-- JS 生成：GPA、素拓、劳动、已修学分 -->
-                </div>
+                <div class="sidebar-section-title">学业记录</div>
+                <div id="academic-stats-list"></div>
             </div>
 
-            <!-- 右侧：主操作区 -->
-            <div class="main-area">
+            <!-- 右侧：主界面 -->
+            <div class="main-view">
+                <!-- 顶栏 -->
+                <div class="top-bar">
+                    <div id="game-date" class="game-date">第1年 | 9月</div>
+                </div>
 
-                <!-- 头部：时间与Tab -->
-                <div class="game-header">
-                    <div class="time-display" id="game-time-display">第1年 | 第一学期-开学</div>
-                    <div class="game-tabs">
-                        <button id="tab-tasks" class="active">待办事项</button>
-                        <button id="tab-logs">生涯记录</button>
+                <!-- 工作区：左卡片，右日志 -->
+                <div class="game-workspace">
+                    <div class="left-panel" id="card-area">
+                        <!-- 卡片 JS 动态生成 -->
+                    </div>
+                    <div class="right-panel">
+                        <div id="goal-tracker" style="border-bottom:1px solid #eee; padding-bottom:10px;"></div>
+                        <h4 style="margin:10px 0 5px 0; color:#999; font-size:12px">🗓️ 生涯记录</h4>
+                        <div id="log-box"></div>
                     </div>
                 </div>
 
-                <!-- 内容区：任务卡片 -->
-                <div id="view-tasks" class="scroll-content">
-                    <div id="task-container">
-                        <!-- JS动态插入卡片 -->
+                <!-- 底栏 -->
+                <div class="bottom-bar">
+                    <div class="project-bar" id="active-project-bar"></div>
+                    <div class="action-group">
+                        <button class="btn-outline" id="btn-project">🚀 开展项目</button>
+                        <button class="btn-outline" id="btn-shop">🛒 校园超市</button>
+                        <button class="btn-outline" id="btn-goal">🎯 更换目标</button>
+                        <button class="btn-primary" id="btn-next-phase" onclick="GameState.nextPhase()">进入下一阶段 >></button>
                     </div>
                 </div>
-
-                <!-- 内容区：日志 -->
-                <div id="view-logs" class="scroll-content hidden">
-                    <div id="log-list"></div>
-                </div>
-
-                <!-- 底部：推进按钮 -->
-                <div class="game-footer">
-                    <button id="btn-next-phase" class="btn-primary" onclick="GameState.nextPhase()" disabled>进入下一阶段 >></button>
-                </div>
-
             </div>
         </div>
     </div>
 
-    <!-- 引入JS文件，注意顺序 -->
+    <!-- 通用模态框 -->
+    <div id="modal-overlay" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:999">
+        <div style="background:#fff; width:400px; max-width:90%; padding:20px; border-radius:8px;">
+            <h3 id="modal-title" style="margin-top:0">标题</h3>
+            <div id="modal-body" style="max-height:300px; overflow-y:auto"></div>
+            <div style="text-align:right; margin-top:20px;">
+                <button class="btn-sm" id="modal-close">关闭</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/data.js"></script>
     <script src="js/logic.js"></script>
     <script src="js/ui.js"></script>
+    <script>
+        // 初始化下拉菜单的辅助脚本，避免在UI.js里写太杂
+        window.onload = function() {
+            const diffSel = document.getElementById('select-difficulty');
+            for (let k in GameData.difficulties) {
+                diffSel.add(new Option(GameData.difficulties[k].name, k));
+            }
+            const persSel = document.getElementById('select-personality');
+            for (let k in GameData.personalities) {
+                persSel.add(new Option(GameData.personalities[k].name, k));
+            }
+            UI.init();
+        };
+    </script>
 </body>
 </html>
