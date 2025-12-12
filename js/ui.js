@@ -229,7 +229,7 @@ const UI = {
                 <p>最终 GPA: ${GameState.player.stats.gpa}</p>
                 <p>最终 排名: Top ${GameState.player.rank}%</p>
             </div>
-            <button class="btn-primary" style="font-size:18px; padding:15px 40px;" onclick="location.reload()">重新开始</button>
+            <button class="btn-primary" style="font-size:18px; padding:15px 40px;" onclick="location.reload()">REMAKE</button>
         `;
         el.classList.remove('hidden');
     },
@@ -260,12 +260,12 @@ const UI = {
         }
         if (goal.rankReq) {
             const met = GameState.player.rank <= goal.rankReq * 100;
-            reqHtml += `<div style="font-size:12px; color:${met?'var(--success)':'#94a3b8'}">
+            reqHtml += `<div style="font-size:12px; margin-bottom:4px; color:${met?'var(--success)':'#94a3b8'}">
                 排名: Top ${GameState.player.rank}% / ${goal.rankReq*100}% ${met?'✔':''}
             </div>`;
         }
         const met = GameState.player.stats.credits >= GameState.player.difficulty.reqCredits;
-        reqHtml += `<div style="font-size:12px; color:${met?'var(--success)':'#94a3b8'}">
+        reqHtml += `<div style="font-size:12px; margin-bottom:4px; color:${met?'var(--success)':'#94a3b8'}">
             学分: ${GameState.player.stats.credits} / ${GameState.player.difficulty.reqCredits} ${met?'✔':''}
         </div>`;
 
