@@ -1,14 +1,9 @@
 // js/data.js
 
 const GameData = {
-    info: {
-        title: "本科生模拟器 Pro",
-        objective: "保持身心健康，平衡学业与生活，达成你的毕业目标。",
-        author: "339摸鱼中"
-    },
     difficulties: {
         normal: { id: "normal", name: "正常大学", baseCredit: 20, rankDiff: 0 },
-        project985: { id: "project985", name: "985高校", baseCredit: 24, rankDiff: 0.3 }, // rankDiff用于模拟同学水平
+        project985: { id: "project985", name: "985高校", baseCredit: 24, rankDiff: 0.3 },
         top2: { id: "top2", name: "清北学府", baseCredit: 28, rankDiff: 0.6 }
     },
     personalities: {
@@ -18,21 +13,20 @@ const GameData = {
     },
     attributes: [
         // 个人状态 (category: 'basic')
-        { key: "knowledge", name: "知识", icon: "📚", max: 20, category: "basic" },
-        { key: "skills", name: "技能", icon: "💻", max: 20, category: "basic" },
-        { key: "physHealth", name: "身健", icon: "💪", max: 20, critical: 6, category: "basic" }, // 名字缩短以节省空间
-        { key: "mentalHealth", name: "心健", icon: "🧠", max: 20, critical: 6, category: "basic" },
-        { key: "social", name: "社交", icon: "🤝", max: 20, category: "basic" },
-        { key: "money", name: "余额", icon: "💰", max: null, category: "basic" },
+        { key: "knowledge", name: "知识水平", icon: "📚", max: 20, category: "basic" },
+        { key: "skills", name: "技能水平", icon: "💻", max: 20, category: "basic" },
+        { key: "physHealth", name: "身体健康", icon: "💪", max: 20, critical: 6, category: "basic" },
+        { key: "mentalHealth", name: "心理健康", icon: "🧠", max: 20, critical: 6, category: "basic" },
+        { key: "social", name: "社交水平", icon: "🤝", max: 20, category: "basic" },
+        { key: "money", name: "账户余额", icon: "💰", max: null, category: "basic" },
         // 学业情况 (category: 'academic')
-        { key: "gpa", name: "GPA", icon: "💯", max: 4.0, category: "academic" },
         { key: "suTuo", name: "素拓", icon: "🌟", max: null, category: "academic" },
+        { key: "gpa", name: "GPA", icon: "💯", max: 4.0, category: "academic" },
         { key: "labor", name: "劳动", icon: "🧹", max: 20, category: "academic" }
     ],
     timeStructure: {
         totalPhases: 32,
-        subPhases: ["大一上-开学", "大一上-期中", "大一上-期末", "大一-寒假", "大一下-开学", "大一下-期中", "大一下-期末", "大一-暑假"]
-        // 简化逻辑：只定义一套，年份动态拼
+        subPhases: ["上学期-开学", "上学期-期中", "上学期-期末", "寒假", "下学期-开学", "下学期-期中", "下学期-期末", "暑假"]
     },
     // === 新增：毕业目标 ===
     goals: {
@@ -55,7 +49,7 @@ const GameData = {
         { id: 'gym_card', name: '健身卡', cost: 500, type: 'consumable', effect: { physHealth: 3, mentalHealth: 1 }, desc: "身健+3, 心健+1" },
         { id: 'consulting', name: '心理咨询', cost: 800, type: 'consumable', effect: { mentalHealth: 5 }, desc: "心健+5 (救命用)" },
         { id: 'coffee_machine', name: '咖啡机', cost: 1500, type: 'permanent', effect: { energyMax: 20 }, desc: "精力上限+20 (永久, 限购1次)" },
-        { id: 'laptop', name: '高性能笔电', cost: 3000, type: 'permanent', effect: { skillBonus: 0.2 }, desc: "实习效率提升20% (永久, 限购1次)" }
+        { id: 'laptop', name: '高性能笔记本', cost: 3000, type: 'permanent', effect: { skillBonus: 0.2 }, desc: "实习效率提升20% (永久, 限购1次)" }
     ],
     // === 新增：短期项目 ===
     projects: [
@@ -88,7 +82,6 @@ const GameData = {
             desc: "去大厂996，累但搞钱快。"
         }
     ],
-    // 随机事件 (简化版，保留之前逻辑即可，这里只放一个示例)
     events: [
         {
             text: "室友邀请你通宵开黑，你决定：",
