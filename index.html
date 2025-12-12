@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本科生模拟器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. 介绍界面 -->
+    <div id="screen-intro" class="screen">
+        <div class="intro-content">
+            <h1 id="game-title">标题加载中...</h1>
+            <p id="game-objective" class="desc">目标加载中...</p>
+            <button class="btn-primary" onclick="UI.showSetup()">开始新的生涯</button>
+            <p id="game-author" class="author"></p>
+        </div>
+    </div>
+
+    <!-- 2. 设置界面 -->
+    <div id="screen-setup" class="screen hidden">
+        <div class="setup-content">
+            <h2>入学登记</h2>
+
+            <div class="form-group">
+                <label>选择你的大学（难度）：</label>
+                <select id="select-difficulty"></select>
+            </div>
+
+            <div class="form-group">
+                <label>选择你的性格（初始属性）：</label>
+                <select id="select-personality"></select>
+            </div>
+
+            <button class="btn-primary" onclick="UI.startGame()">办理入学手续</button>
+        </div>
+    </div>
+
+    <!-- 3. 真正游戏界面 -->
+    <div id="screen-game" class="screen hidden">
+        <div class="game-container">
+            <!-- 左侧：属性栏 -->
+            <div class="sidebar" id="sidebar">
+                <div class="player-info">
+                    <p><strong>大学：</strong><span id="display-difficulty"></span></p>
+                    <p><strong>性格：</strong><span id="display-personality"></span></p>
+                </div>
+                <div id="attributes-list">
+                    <!-- JS动态生成 -->
+                </div>
+            </div>
+
+            <!-- 右侧：待开发区域 -->
+            <div class="main-area" id="main-area">
+                <h2>这里是校园（待开发...）</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 (用于显示详情) -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 id="modal-title">标题</h3>
+            <p id="modal-body">内容</p>
+            <div class="modal-tip">点击任意处关闭</div>
+        </div>
+    </div>
+
+    <!-- 引入JS文件，注意顺序 -->
+    <script src="js/data.js"></script>
+    <script src="js/logic.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>

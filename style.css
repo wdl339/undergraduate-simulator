@@ -1,0 +1,184 @@
+/* style.css */
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #f5f7fa;
+    --text-color: #333;
+    --bg-color: #eef2f3;
+    --card-bg: #fff;
+    --danger-color: #e74c3c;
+    --success-color: #2ecc71;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 通用容器 */
+.screen {
+    background: var(--card-bg);
+    width: 800px;
+    height: 600px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 介绍页 & 设置页 */
+.intro-content, .setup-content {
+    padding: 40px;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 { color: var(--primary-color); margin-bottom: 10px; }
+.desc { color: #666; margin-bottom: 30px; line-height: 1.6; }
+.author { font-size: 0.9em; color: #999; margin-top: 20px; }
+
+/* 按钮样式 */
+button.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button.btn-primary:hover {
+    background-color: #357abd;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    width: 80%;
+    text-align: left;
+}
+.form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd; }
+
+/* 游戏主界面布局 */
+.game-container {
+    display: flex;
+    height: 100%;
+}
+
+.sidebar {
+    width: 280px;
+    background: #fafafa;
+    border-right: 1px solid #eee;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-area {
+    flex: 1;
+    padding: 20px;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #999;
+}
+
+/* 左侧属性栏 */
+.player-info {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+.player-info p { margin: 5px 0; }
+
+.attribute-item {
+    margin-bottom: 15px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.attr-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.attr-icon { margin-right: 5px; }
+.attr-name { font-weight: 600; font-size: 14px; flex: 1; }
+.btn-detail {
+    background: #eee;
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+    color: #666;
+}
+
+.progress-bg {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.attr-val {
+    font-size: 12px;
+    color: #888;
+    text-align: right;
+}
+
+/* 模态框 */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    max-width: 90%;
+}
+.modal h3 { margin-top: 0; }
+.modal p { color: #555; line-height: 1.5; }
+.modal-tip { font-size: 12px; color: #999; text-align: center; margin-top: 15px;}
