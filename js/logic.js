@@ -117,6 +117,11 @@ const GameState = {
 
     // === 精力分配与预测 ===
 
+    calChangeKnowledge: function(studyInput) {
+        const baseGain = (studyInput / 20) * 0.45;
+        return baseGain;
+    },
+
     // 供UI调用的预测函数 (不改变实际属性)
     getEnergyPreview: function(alloc) {
         const p = this.player.stats;
@@ -125,7 +130,8 @@ const GameState = {
         let warnings = [];
 
         // 1. 收益
-        changes.knowledge += (alloc.study / 20) * 0.45;
+        changes.knowledge += this.calChangeKnowledge(alloc.study);
+        changes.skills += this.calChangeKnowledge(alloc.study) * flags.skillBonus;
         changes.skills += (alloc.study / 20) * 0.45 * flags.skillBonus;
         const restGain = (alloc.rest - 20) / 20 * 0.8;
         changes.physHealth += restGain;
@@ -191,9 +197,9 @@ const GameState = {
     // === GPA 预测与计算 ===
 
     // 辅助函数：计算基础GPA
-    calculateBaseGPA: function(avgEffort, credits) {
+    calculateBaseGPA: function(knowledge, avgEffort, credits) {
         // 知识分：满分3.0（20知识）
-        const knowledgeBase = this.player.stats.knowledge * 0.15;
+        const knowledgeBase = knowledge * 0.15;
         // 努力分：
         // 假设标准努力是 每学分2.5精力/每阶段
         // 例如：20学分 -> 50精力/阶段 -> 努力分 3.0
@@ -202,6 +208,7 @@ const GameState = {
         if (requiredEffortPerPhase > 0) {
             effortScore = (avgEffort / requiredEffortPerPhase) * 3.0;
         }
+        // console.log(`BaseGPA Calc - Knowledge: ${knowledge}, KnowledgeBase: ${knowledgeBase.toFixed(2)}, EffortScore: ${effortScore.toFixed(2)}, Sum: ${(knowledgeBase + effortScore -2.0).toFixed(2)}`);
         return knowledgeBase + effortScore - 2.0;
     },
 
@@ -223,7 +230,8 @@ const GameState = {
         // 防止除以0
         let avgEffort = projectedPhases > 0 ? (projectedEffort / projectedPhases) : 0;
 
-        let baseGPA = this.calculateBaseGPA(avgEffort, credits);
+        tmpChangeKnowledge = this.player.stats.knowledge + this.calChangeKnowledge(currentStudyInput);
+        let baseGPA = this.calculateBaseGPA(tmpChangeKnowledge, avgEffort, credits);
         // 随机浮动 +/- 0.2
         const semesterMin = Math.max(0, Math.min(4.0, baseGPA - 0.2));
         const semesterMax = Math.max(0, Math.min(4.0, baseGPA + 0.2));
@@ -262,7 +270,7 @@ const GameState = {
         // 平均努力
         let avgEffort = ac.classPhasesPassed > 0 ? (ac.studyEffortAcc / ac.classPhasesPassed) : 0;
 
-        let baseGPA = this.calculateBaseGPA(avgEffort, ac.currentSemesterCredits);
+        let baseGPA = this.calculateBaseGPA(this.player.stats.knowledge, avgEffort, ac.currentSemesterCredits);
         let finalGPA = baseGPA + (Math.random() * 0.2 * 2 - 0.2); // -0.2 ~ +0.2
         finalGPA = parseFloat(Math.max(0, Math.min(4.0, finalGPA)).toFixed(2));
 

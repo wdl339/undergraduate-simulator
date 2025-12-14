@@ -333,7 +333,7 @@ const UI = {
 
             <!-- GPA预测 -->
             <div id="gpa-prediction" style="background:#f0f9ff; padding:10px; border-radius:6px; margin-bottom:20px; font-size:12px; color:#0369a1; border:1px solid #bae6fd;">
-                GPA预测: 调整学习投入查看...
+                假期进行中
             </div>
 
             <div id="slider-group"></div>
@@ -393,7 +393,9 @@ const UI = {
         // 更新GPA预测
         const pred = GameState.getGPAPrediction(alloc.study);
         const gpaText = `预计本学期获得 GPA ${pred.semester.min.toFixed(1)}~${pred.semester.max.toFixed(1)}，总 GPA 变化为 ${pred.total.min.toFixed(1)}~${pred.total.max.toFixed(1)}`;
-        document.getElementById('gpa-prediction').innerHTML = gpaText;
+        if (GameState.player.time.isClass) {
+            document.getElementById('gpa-prediction').innerHTML = gpaText;
+        }
     },
 
     submitEnergy: function() {

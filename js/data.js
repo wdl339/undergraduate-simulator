@@ -22,8 +22,8 @@ const GameData = {
         // 学业属性
         { key: "gpa", name: "GPA", icon: "💯", max: 4.0, category: "academic" },
         { key: "credits", name: "已修学分", icon: "🎓", max: null, category: "academic" }, // max将在逻辑中动态获取
+        { key: "labor", name: "劳动学时", icon: "🧹", max: 20, category: "academic" },
         { key: "suTuo", name: "素拓分数", icon: "🌟", max: null, category: "academic" },
-        { key: "labor", name: "劳动学时", icon: "🧹", max: 20, category: "academic" }
     ],
     timeStructure: {
         totalPhases: 32,
