@@ -28,13 +28,13 @@ const GameData = {
     timeStructure: {
         totalPhases: 32,
         subPhases: [
-            { name: "第1学期-开学", isClass: true },
-            { name: "第1学期-期中", isClass: true },
-            { name: "第1学期-期末", isClass: true },
+            { name: "第 1 学期-开学", isClass: true },
+            { name: "第 1 学期-期中", isClass: true },
+            { name: "第 1 学期-期末", isClass: true },
             { name: "寒假", isClass: false },
-            { name: "第2学期-开学", isClass: true },
-            { name: "第2学期-期中", isClass: true },
-            { name: "第2学期-期末", isClass: true },
+            { name: "第 2 学期-开学", isClass: true },
+            { name: "第 2 学期-期中", isClass: true },
+            { name: "第 2 学期-期末", isClass: true },
             { name: "暑假", isClass: false }
         ]
     },

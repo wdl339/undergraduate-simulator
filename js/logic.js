@@ -446,7 +446,7 @@ const GameState = {
     addLog: function(msg) {
         const t = this.player.time;
         const subPhaseName = GameData.timeStructure.subPhases[Math.max(0, t.phaseIdx) % 8].name;
-        const timeStr = `第${t.year}年 | ${subPhaseName}`;
+        const timeStr = `第 ${t.year} 年 | ${subPhaseName}`;
         this.player.logs.unshift({ time: timeStr, msg: msg });
     },
 

@@ -109,7 +109,7 @@ const UI = {
         // 日期
         const t = GameState.player.time;
         const phaseName = GameData.timeStructure.subPhases[Math.max(0, t.phaseIdx) % 8].name;
-        document.getElementById('game-date').innerText = `第${t.year}年 | ${phaseName}`;
+        document.getElementById('game-date').innerText = `第 ${t.year} 年 | ${phaseName}`;
     },
 
 
