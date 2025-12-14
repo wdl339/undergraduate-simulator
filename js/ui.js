@@ -499,33 +499,5 @@ const UI = {
             </div>
             <div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div>
         `;
-    },
-
-    showFloatingEffects: function(changes) {
-        const area = document.getElementById('card-area');
-        let delay = 0;
-        for (let k in changes) {
-            if (Math.abs(changes[k]) < 0.1) continue;
-            const el = document.createElement('div');
-            const val = changes[k] > 0 ? `+${changes[k].toFixed(1)}` : changes[k].toFixed(1);
-            const name = GameData.attributes.find(a=>a.key===k).name;
-            const isGood = changes[k] > 0;
-
-            el.innerText = `${name} ${val}`;
-            el.style.cssText = `
-                position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-                font-weight: 800; font-size: 20px; pointer-events: none;
-                color: ${isGood ? 'var(--success)' : 'var(--danger)'};
-                animation: floatUp 1.5s forwards; animation-delay: ${delay}s;
-                text-shadow: 0 2px 4px rgba(255,255,255,0.8);
-            `;
-            const styleSheet = document.createElement("style");
-            styleSheet.innerHTML = `@keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 0); } 20% { opacity: 1; transform: translate(-50%, -40px); } 100% { opacity: 0; transform: translate(-50%, -100px); } }`;
-            document.head.appendChild(styleSheet);
-
-            area.appendChild(el);
-            setTimeout(() => el.remove(), 2000);
-            delay += 0.2;
-        }
     }
 };

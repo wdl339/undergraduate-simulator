@@ -332,7 +332,6 @@ const GameState = {
                 this.applyChange(rewards, k, proj.reward[k]);
             }
             this.addLog(`✅ 项目【${proj.name}】圆满完成！`);
-            UI.showFloatingEffects(rewards);
             this.player.activeProject = null;
         }
     },
@@ -358,7 +357,6 @@ const GameState = {
             for (let k in item.effect) {
                 this.applyChange(changes, k, item.effect[k]);
             }
-            UI.showFloatingEffects(changes);
         }
         this.addLog(`🛍️ 购买了 ${item.name}`);
         UI.updateAll();
