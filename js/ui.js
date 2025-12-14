@@ -258,10 +258,10 @@ const UI = {
                 ${GameData.attributes.find(a=>a.key===k).name}: ${cur.toFixed(1)} / ${need} ${met?'✔':''}
             </div>`;
         }
-        if (goal.rankReq) {
-            const met = GameState.player.rank <= goal.rankReq * 100;
+        if (goal.require_rank) {
+            const met = GameState.player.rank <= GameState.player.difficulty.reqRank * 100;
             reqHtml += `<div style="font-size:12px; margin-bottom:4px; color:${met?'var(--success)':'#94a3b8'}">
-                排名: Top ${GameState.player.rank}% / ${goal.rankReq*100}% ${met?'✔':''}
+                排名: Top ${GameState.player.rank}% / ${GameState.player.difficulty.reqRank*100}% ${met?'✔':''}
             </div>`;
         }
         const met = GameState.player.stats.credits >= GameState.player.difficulty.reqCredits;

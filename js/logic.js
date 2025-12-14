@@ -400,7 +400,7 @@ const GameState = {
         const s = this.player.stats;
         if (s.credits < this.player.difficulty.reqCredits) return false;
         for (let k in g.req) if (s[k] < g.req[k]) return false;
-        if (g.rankReq && (this.player.rank / 100) > g.rankReq) return false;
+        if (g.require_rank && (this.player.rank / 100) > this.player.difficulty.reqRank) return false;
 
         return true;
     },

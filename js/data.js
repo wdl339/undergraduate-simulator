@@ -2,9 +2,9 @@
 
 const GameData = {
     difficulties: {
-        normal: { id: "normal", name: "正常大学", baseCredit: 20, reqCredits: 160, rankDiff: 0 },
-        // project985: { id: "project985", name: "985高校", baseCredit: 24, reqCredits: 170, rankDiff: 0.3 },
-        // top2: { id: "top2", name: "清北学府", baseCredit: 28, reqCredits: 180, rankDiff: 0.6 }
+        normal: { id: "normal", name: "正常大学", baseCredit: 20, reqCredits: 160, rankDiff: 0, reqRank: 0.15 },
+    //     project985: { id: "project985", name: "985高校", baseCredit: 24, reqCredits: 170, rankDiff: 0.3, reqRank: 0.30 },
+    //     top2: { id: "top2", name: "清北学府", baseCredit: 28, reqCredits: 180, rankDiff: 0.6, reqRank: 0.40 }
     },
     personalities: {
         average: { id: "average", name: "平平无奇", statsModifier: 10, regularMoney: 2000 },
@@ -27,11 +27,10 @@ const GameData = {
     ],
     timeStructure: {
         totalPhases: 32,
-        // 标记哪些阶段是上课时间（用于算GPA分母），哪些是假期
         subPhases: [
             { name: "第1学期-开学", isClass: true },
             { name: "第1学期-期中", isClass: true },
-            { name: "第学期-期末", isClass: true },
+            { name: "第1学期-期末", isClass: true },
             { name: "寒假", isClass: false },
             { name: "第2学期-开学", isClass: true },
             { name: "第2学期-期中", isClass: true },
@@ -39,18 +38,17 @@ const GameData = {
             { name: "暑假", isClass: false }
         ]
     },
-    // ... (goals, shopItems, projects, events 保持不变，可复用之前的) ...
     goals: {
         gradSchool: {
             id: 'gradSchool', name: '保研深造',
             req: { knowledge: 16, skills: 10, gpa: 3.6, labor: 20 },
-            rankReq: 0.15,
+            require_rank: true,
             desc: "成为学术大佬，免试攻读研究生"
         },
         job: {
             id: 'job', name: '直接就业',
             req: { skills: 16, social: 10, labor: 20 },
-            rankReq: null,
+            require_rank: false,
             desc: "积累实习经验，毕业即拿高薪Offer"
         }
     },
@@ -111,7 +109,7 @@ const GameData = {
             text: "路上捡到一张校园卡：",
             options: [
                 { text: "想办法还给失主", effect: { social: 1, suTuo: 0.5 } },
-                { text: "不管它", effect: {} } // 无事发生
+                { text: "不管它", effect: {} }
             ]
         }
     ]
