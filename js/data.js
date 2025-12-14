@@ -2,9 +2,9 @@
 
 const GameData = {
     difficulties: {
-        normal: { id: "normal", name: "正常大学", reqCredits: 160, rankDiff: 0, reqRank: 0.15 },
-    //     project985: { id: "project985", name: "985高校", reqCredits: 170, rankDiff: 0.3, reqRank: 0.30 },
-    //     top2: { id: "top2", name: "清北学府", reqCredits: 180, rankDiff: 0.6, reqRank: 0.40 }
+        normal: { id: "normal", name: "正常大学", reqCredits: 160, rankDiff: 0, reqRank: 0.15, quitGPA: 1.5 },
+    //     project985: { id: "project985", name: "985高校", reqCredits: 170, rankDiff: 0.3, reqRank: 0.30, quitGPA: 2.0 },
+    //     top2: { id: "top2", name: "清北学府", reqCredits: 180, rankDiff: 0.6, reqRank: 0.40, quitGPA: 2.5 },
     },
     personalities: {
         average: { id: "average", name: "平平无奇", statsModifier: 10, regularMoney: 2000 },

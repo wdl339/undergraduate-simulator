@@ -259,6 +259,27 @@ const GameState = {
         this.completeTask('final_exam');
     },
 
+    rankAndScholarship: function() {
+        const diff = this.player.difficulty.rankDiff;
+        const playerScore = this.player.stats.gpa * 10 + this.player.stats.suTuo;
+        let baseRank = 100 - (playerScore * 1.8);
+        baseRank += (diff * 20);
+        baseRank = Math.max(1, Math.min(99, baseRank + (Math.random() * 10 - 5)));
+
+        this.player.rank = Math.floor(baseRank);
+        this.addLog(`🏆 学年结算：你的综合排名位于前 ${this.player.rank}%`);
+
+        if (this.player.rank <= 5) {
+            this.addLog("🥇 获得【国家奖学金】！(奖金8000，社交+3)");
+            this.applyChange({}, 'money', 8000);
+            this.applyChange({}, 'social', 3);
+        } else if (this.player.rank <= 15) {
+            this.addLog("🥈 获得【学业一等奖】！(奖金3000，社交+1)");
+            this.applyChange({}, 'money', 3000);
+            this.applyChange({}, 'social', 1);
+        }
+    },
+
     // === 事件与任务 ===
 
     resolveEvent: function(eff) {
@@ -354,41 +375,19 @@ const GameState = {
         UI.updateAll();
     },
 
-    rankAndScholarship: function() {
-        const diff = this.player.difficulty.rankDiff;
-        const playerScore = this.player.stats.gpa * 10 + this.player.stats.suTuo;
-        let baseRank = 100 - (playerScore * 1.8);
-        baseRank += (diff * 20);
-        baseRank = Math.max(1, Math.min(99, baseRank + (Math.random() * 10 - 5)));
-
-        this.player.rank = Math.floor(baseRank);
-        this.addLog(`🏆 学年结算：你的综合排名位于前 ${this.player.rank}%`);
-
-        if (this.player.rank <= 5) {
-            this.addLog("🥇 获得【国家奖学金】！(奖金8000，社交+3)");
-            this.applyChange({}, 'money', 8000);
-            this.applyChange({}, 'social', 3);
-        } else if (this.player.rank <= 15) {
-            this.addLog("🥈 获得【学业一等奖】！(奖金3000，社交+1)");
-            this.applyChange({}, 'money', 3000);
-            this.applyChange({}, 'social', 1);
-        }
-    },
-
     checkBadEndings: function() {
         const s = this.player.stats;
         if (s.money < 0) this.player.consecutiveBankrupt++;
         else this.player.consecutiveBankrupt = 0;
 
         if (this.player.consecutiveBankrupt >= 3) return this.triggerEnding('bankrupt');
-        if (s.gpa > 0 && s.gpa < 1.5 && this.player.time.phaseIdx > 8) return this.triggerEnding('dropout');
+        if (s.gpa > 0 && s.gpa < this.player.difficulty.quitGPA && this.player.time.phaseIdx > 8) return this.triggerEnding('dropout');
         if (s.mentalHealth <= 0) return this.triggerEnding('suicide');
         if (s.physHealth <= 0) return this.triggerEnding('death');
-        if (s.social <= 0 && this.player.time.phaseIdx > 16) return this.triggerEnding('outcast');
+        if (s.social <= 0 && this.player.time.phaseIdx > 8) return this.triggerEnding('outcast');
         return false;
     },
 
-    // 结局判断增加学分
     checkGoodEnding: function() {
         const g = GameData.goals[this.player.currentGoal];
         const s = this.player.stats;
@@ -404,35 +403,34 @@ const GameState = {
         switch(type) {
             case 'happy':
                 title = "完美达成";
-                desc = `恭喜！你成功实现了目标【${GameData.goals[this.player.currentGoal].name}】，没有辜负这四年的青春。你的未来拥有无限可能！`;
+                desc = `恭喜！你成功实现了目标【${GameData.goals[this.player.currentGoal].name}】，没有辜负这四年的青春。我们都有光明的未来！`;
                 isGood = true;
                 break;
             case 'bad_grad':
                 title = "平淡毕业";
-                desc = "你顺利拿到了毕业证，但回首大学四年，似乎离当初定下的宏伟目标还有一段距离。不过，人生是场长跑，这只是个开始。";
+                desc = `你顺利拿到了毕业证，但回首大学四年，似乎离当初定下的宏伟目标【${GameData.goals[this.player.currentGoal].name}】还有一段距离`;
                 break;
             case 'bankrupt':
                 title = "无奈退学";
-                desc = "连续的经济危机让你无力支付学费和生活费。看着空荡荡的钱包，你只能收拾行李，提前告别校园去打工还债。";
+                desc = "连续的经济危机让你无力支付学费和生活费。看着空荡荡的钱包，你只能收拾行李，提前告别校园，开启打工生涯";
                 break;
             case 'dropout':
                 title = "劝退离校";
-                desc = "由于GPA长期过低，触发了学业预警机制。教务处发来了最终通知书，你的大学生涯到此结束。";
+                desc = "由于GPA过低，触发了学业预警机制。教务处发来了最终通知书，你的大学生涯到此结束";
                 break;
             case 'suicide':
                 title = "心理崩溃";
-                desc = "长期的压力与抑郁压垮了你的最后一根稻草。世界变成了灰色，你选择了自我封闭，无法继续学业。";
+                desc = "长期的压力与抑郁压垮了你的最后一根稻草。世界变成了灰色，你选择了一跳了之";
                 break;
             case 'death':
                 title = "过劳倒下";
-                desc = "无视身体发出的警告，长期的熬夜与透支终于让你在某个清晨倒下，再也没有醒来。健康才是最大的本钱啊。";
+                desc = "无视身体发出的警告，长期的熬夜与透支终于让你在某个清晨倒下，再也没有醒来。健康才是最大的本钱啊";
                 break;
             case 'outcast':
                 title = "孤岛人生";
-                desc = "极度缺乏社交让你与周围的世界完全脱节。在孤独的吞噬下，你选择了悄然离开，没有人注意到你的离去。";
+                desc = "极度缺乏社交让你与周围的世界完全脱节。在孤独的吞噬下，你选择了悄然离开，没有人注意到你的离去";
                 break;
         }
-        // 不再弹窗，而是调用UI层的新界面
         UI.showEndingScreen(title, desc, isGood);
     },
 
