@@ -1,16 +1,10 @@
 // js/data.js
 
 const GameData = {
-    info: {
-        title: "本科生模拟器 Pro",
-        objective: "平衡学业与生活，达成毕业目标。",
-        author: "339摸鱼中"
-    },
     difficulties: {
-        // reqCredits: 毕业所需总学分
         normal: { id: "normal", name: "正常大学", baseCredit: 20, reqCredits: 160, rankDiff: 0 },
-        project985: { id: "project985", name: "985高校", baseCredit: 24, reqCredits: 170, rankDiff: 0.3 },
-        top2: { id: "top2", name: "清北学府", baseCredit: 28, reqCredits: 180, rankDiff: 0.6 }
+        // project985: { id: "project985", name: "985高校", baseCredit: 24, reqCredits: 170, rankDiff: 0.3 },
+        // top2: { id: "top2", name: "清北学府", baseCredit: 28, reqCredits: 180, rankDiff: 0.6 }
     },
     personalities: {
         average: { id: "average", name: "平平无奇", statsModifier: 10 },

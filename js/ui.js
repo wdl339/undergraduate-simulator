@@ -306,9 +306,9 @@ const UI = {
         }
         btnNext.disabled = true;
 
+        if (tasks.includes('course_selection')) { this.renderCourseCard(container); return; }
         if (tasks.includes('energy_allocation')) { this.renderEnergyCard(container); return; }
         if (tasks.includes('random_event')) { this.renderEventCard(container); return; }
-        if (tasks.includes('course_selection')) { this.renderCourseCard(container); return; }
         if (tasks.includes('final_exam')) {
             container.innerHTML = `
             <div class="card">
@@ -472,7 +472,7 @@ const UI = {
         container.innerHTML = `
             <div class="card">
                 <h3>📚 学期选课</h3>
-                <p style="font-size:13px; color:#64748b; margin-bottom:15px">毕业还需 ${remaining} 学分。</p>
+                <p style="font-size:13px; color:#64748b; margin-bottom:15px">毕业还需 ${remaining} 学分</p>
                 <div class="slider-row">
                    <label>学分</label>
                    <input type="range" min="10" max="40" value="${defaultVal}" oninput="this.nextElementSibling.innerText=this.value" id="c-inp">
