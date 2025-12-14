@@ -132,7 +132,6 @@ const GameState = {
         // 1. 收益
         changes.knowledge += this.calChangeKnowledge(alloc.study);
         changes.skills += this.calChangeKnowledge(alloc.study) * flags.skillBonus;
-        changes.skills += (alloc.study / 20) * 0.45 * flags.skillBonus;
         const restGain = (alloc.rest - 20) / 20 * 0.8;
         changes.physHealth += restGain;
         changes.mentalHealth += restGain;
@@ -290,21 +289,21 @@ const GameState = {
 
     rankAndScholarship: function() {
         const diff = this.player.difficulty.rankDiff;
-        const playerScore = this.player.stats.gpa * 10 + this.player.stats.suTuo;
-        let baseRank = 100 - (playerScore * 1.8);
+        const playerScore = this.player.stats.gpa * 9 + this.player.stats.suTuo * 5;
+        let baseRank = 100 - (playerScore * 2);
         baseRank += (diff * 20);
-        baseRank = Math.max(1, Math.min(99, baseRank + (Math.random() * 10 - 5)));
+        baseRank = Math.max(1, Math.min(99, baseRank + (Math.random() * 3 * 2 - 3)));
 
         this.player.rank = Math.floor(baseRank);
-        this.addLog(`🏆 学年结算：你的综合排名位于前 ${this.player.rank}%`);
+        this.addLog(`🏆 奖学金评选：你的综合排名位于前 ${this.player.rank}%`);
 
         if (this.player.rank <= 5) {
-            this.addLog("🥇 获得【国家奖学金】！(奖金8000，社交+3)");
-            this.applyChange({}, 'money', 8000);
-            this.applyChange({}, 'social', 3);
-        } else if (this.player.rank <= 15) {
-            this.addLog("🥈 获得【学业一等奖】！(奖金3000，社交+1)");
-            this.applyChange({}, 'money', 3000);
+            this.addLog("🥇 获得【国家奖学金】！(奖金5000，社交+2)");
+            this.applyChange({}, 'money', 5000);
+            this.applyChange({}, 'social', 2);
+        } else if (this.player.rank <= 20) {
+            this.addLog("🥈 获得【优秀奖学金】！(奖金1000，社交+1)");
+            this.applyChange({}, 'money', 1000);
             this.applyChange({}, 'social', 1);
         }
     },
