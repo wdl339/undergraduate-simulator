@@ -190,7 +190,7 @@ const UI = {
             return `
                 <div class="list-item">
                     <div class="list-item-left">
-                        <strong>${item.name} <span style="font-size:10px; background:#f1f5f9; padding:2px 5px; border-radius:4px">${isPerm?'永久':'消耗'}</span></strong>
+                        <strong>${item.name} <span style="font-size:10px; background:#f1f5f9; padding:2px 5px; border-radius:4px">${isPerm?'永久':'无限'}</span></strong>
                         <p>${item.desc}</p>
                     </div>
                     <button class="btn-primary" style="padding:6px 12px; font-size:12px;"

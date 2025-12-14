@@ -92,7 +92,7 @@ const GameState = {
         // 开学：选课 & 生活费
         if (isStartOfSemester) {
             this.player.stats.money += this.player.personality.regularMoney;
-            this.addLog(`💰 获得生活费 ${this.player.personality.regularMoney}元。`);
+            this.addLog(`💰 获得生活费 ${this.player.personality.regularMoney} 元。`);
 
             // 智能推荐学分： (总需 - 已修) / 剩余学期数
             const remainingCredits = Math.max(0, this.player.difficulty.reqCredits - this.player.academics.totalCredits);

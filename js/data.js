@@ -70,13 +70,13 @@ const GameData = {
             id: 'research', name: '进组科研', duration: 4,
             req: { knowledge: 15, gpa: 3.6 },
             costPerTurn: { physHealth: 1, mentalHealth: 1 },
-            reward: { knowledge: 3, skills: 2, suTuo: 1 }
+            reward: { knowledge: 4, skills: 2, suTuo: 3 }
         },
         {
             id: 'dating', name: '谈恋爱', duration: 5,
             req: { social: 12, money: 3000 },
             costPerTurn: { money: 500 },
-            reward: { mentalHealth: 5, social: 5, physHealth: -1 }
+            reward: { mentalHealth: 5, social: 5, physHealth: 1 }
         },
         {
             id: 'internship', name: '大厂实习', duration: 4,
