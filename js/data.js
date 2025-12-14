@@ -2,9 +2,9 @@
 
 const GameData = {
     difficulties: {
-        normal: { id: "normal", name: "正常大学", baseCredit: 20, reqCredits: 160, rankDiff: 0, reqRank: 0.15 },
-    //     project985: { id: "project985", name: "985高校", baseCredit: 24, reqCredits: 170, rankDiff: 0.3, reqRank: 0.30 },
-    //     top2: { id: "top2", name: "清北学府", baseCredit: 28, reqCredits: 180, rankDiff: 0.6, reqRank: 0.40 }
+        normal: { id: "normal", name: "正常大学", reqCredits: 160, rankDiff: 0, reqRank: 0.15 },
+    //     project985: { id: "project985", name: "985高校", reqCredits: 170, rankDiff: 0.3, reqRank: 0.30 },
+    //     top2: { id: "top2", name: "清北学府", reqCredits: 180, rankDiff: 0.6, reqRank: 0.40 }
     },
     personalities: {
         average: { id: "average", name: "平平无奇", statsModifier: 10, regularMoney: 2000 },
@@ -43,50 +43,46 @@ const GameData = {
             id: 'gradSchool', name: '保研深造',
             req: { knowledge: 16, skills: 10, gpa: 3.6, labor: 20 },
             require_rank: true,
-            desc: "成为学术大佬，免试攻读研究生"
+            desc: "立志钻研学术，争取免试攻读研究生"
         },
         job: {
             id: 'job', name: '直接就业',
             req: { skills: 16, social: 10, labor: 20 },
             require_rank: false,
-            desc: "积累实习经验，毕业即拿高薪Offer"
+            desc: "积累实习经验，毕业冲刺高薪Offer"
         }
     },
     shopItems: [
-        { id: 'book', name: '专业书籍', cost: 200, type: 'consumable', effect: { knowledge: 1.5 }, desc: "知识水平+1.5" },
-        { id: 'gym_card', name: '健身卡', cost: 500, type: 'consumable', effect: { physHealth: 3, mentalHealth: 1 }, desc: "身体健康+3, 心理健康+1" },
-        { id: 'consulting', name: '心理咨询', cost: 800, type: 'consumable', effect: { mentalHealth: 5 }, desc: "心理健康+5" },
-        { id: 'coffee_machine', name: '咖啡机', cost: 1500, type: 'permanent', effect: { energyMax: 20 }, desc: "精力上限+20 (永久, 限购1次)" },
-        { id: 'laptop', name: '高性能笔记本', cost: 3000, type: 'permanent', effect: { skillBonus: 0.2 }, desc: "实习效率提升20% (永久, 限购1次)" }
+        { id: 'book', name: '专业书籍', cost: 400, type: 'consumable', effect: { knowledge: 0.5 }, desc: "知识水平+0.5" },
+        { id: 'gym_card', name: '羽毛球教学', cost: 900, type: 'consumable', effect: { physHealth: 3}, desc: "身体健康+3" },
+        { id: 'consulting', name: '心理咨询', cost: 800, type: 'consumable', effect: { mentalHealth: 2}, desc: "心理健康+2" },
+        { id: 'coffee_machine', name: '咖啡机', cost: 2000, type: 'permanent', effect: { energyMax: 20 }, desc: "精力上限+20 (永久, 限购1次)" },
+        { id: 'laptop', name: '高性能笔记本', cost: 3500, type: 'permanent', effect: { skillBonus: 0.15 }, desc: "技能水平的获取效率提升15% (永久, 限购1次)" }
     ],
     projects: [
         {
             id: 'competition', name: '学科竞赛', duration: 3,
-            req: { knowledge: 12 },
-            costPerTurn: { mentalHealth: 0.5 },
-            reward: { suTuo: 2, skills: 1, knowledge: 1 },
-            desc: "参加全国大学生竞赛"
+            req: { knowledge: 12, skills: 12 },
+            costPerTurn: { physHealth: 0.5, mentalHealth: 1 },
+            reward: { suTuo: 2, skills: 2, knowledge: 2, labor: 5 }
         },
         {
             id: 'research', name: '进组科研', duration: 4,
-            req: { knowledge: 15, gpa: 3.3 },
-            costPerTurn: { physHealth: 0.5 },
-            reward: { knowledge: 3, skills: 2, suTuo: 1 },
-            desc: "给导师打工"
+            req: { knowledge: 15, gpa: 3.6 },
+            costPerTurn: { physHealth: 1, mentalHealth: 1 },
+            reward: { knowledge: 3, skills: 2, suTuo: 1 }
         },
         {
             id: 'dating', name: '谈恋爱', duration: 5,
-            req: { social: 12, money: 1000 },
-            costPerTurn: { money: 200},
-            reward: { mentalHealth: 5, social: 3 },
-            desc: "甜甜的恋爱，消耗金钱但治愈心灵"
+            req: { social: 12, money: 3000 },
+            costPerTurn: { money: 500 },
+            reward: { mentalHealth: 5, social: 5, physHealth: -1 }
         },
         {
             id: 'internship', name: '大厂实习', duration: 4,
-            req: { skills: 10 },
-            costPerTurn: { physHealth: 1 },
-            reward: { money: 3000, skills: 3 },
-            desc: "大厂996，累但搞钱快"
+            req: { social: 8, skills: 10 },
+            costPerTurn: { physHealth: 1, mentalHealth: 0.5, social: 0.5 },
+            reward: { money: 3000, skills: 3, mentalHealth: 2 }
         }
     ],
     events: [
@@ -101,7 +97,7 @@ const GameData = {
         {
             text: "突发流感，你感觉喉咙不舒服：",
             options: [
-                { text: "立刻去校医院", effect: { money: -100, physHealth: 1 } },
+                { text: "立刻去校医院", effect: { money: -300, physHealth: 2 } },
                 { text: "硬抗", effect: { physHealth: -3, mentalHealth: -1 } }
             ]
         },

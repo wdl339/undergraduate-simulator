@@ -148,13 +148,19 @@ const UI = {
                 return `${attrName}-${p.costPerTurn[k]}`;
             }).join(', ');
 
+            // 奖励描述
+            const rewardDesc = Object.keys(p.reward).map(k => {
+                const attrName = GameData.attributes.find(a=>a.key===k).name;
+                return `${attrName}+${p.reward[k]}`;
+            }).join(', ');
+
             return `
                 <div class="list-item">
                     <div class="list-item-left">
                         <strong>${p.name} <span style="font-size:12px; font-weight:normal; color:#999">持续${p.duration}阶段</span></strong>
                         <div style="margin:5px 0">${reqHtml}</div>
                         <p>每阶段消耗: ${costDesc}</p>
-                        <p style="margin-top:4px; color:#64748b">${p.desc}</p>
+                        <p>完成项目奖励: ${rewardDesc}</p>
                     </div>
                     <button class="btn-primary" style="padding:6px 12px; font-size:12px;"
                         ${canStart ? '' : 'disabled'}
