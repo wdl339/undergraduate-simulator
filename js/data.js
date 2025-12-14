@@ -7,9 +7,9 @@ const GameData = {
         // top2: { id: "top2", name: "清北学府", baseCredit: 28, reqCredits: 180, rankDiff: 0.6 }
     },
     personalities: {
-        average: { id: "average", name: "平平无奇", statsModifier: 10 },
-        gifted: { id: "gifted", name: "天赋异禀", statsModifier: 15 },
-        frail: { id: "frail", name: "弱不禁风", statsModifier: 5 }
+        average: { id: "average", name: "平平无奇", statsModifier: 10, regularMoney: 2000 },
+        gifted: { id: "gifted", name: "天赋异禀", statsModifier: 15, regularMoney: 2000 },
+        frail: { id: "frail", name: "弱不禁风", statsModifier: 5, regularMoney: 2000 },
     },
     attributes: [
         { key: "knowledge", name: "知识水平", icon: "📚", max: 20, category: "basic" },

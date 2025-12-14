@@ -40,9 +40,7 @@ const GameState = {
         this.player.consecutiveBankrupt = 0;
 
         GameData.attributes.forEach(attr => {
-            if (attr.key === 'money') this.player.stats[attr.key] = 3000; // 稍微多给点初始资金
-            else if (['gpa','suTuo','labor'].includes(attr.key)) this.player.stats[attr.key] = 0;
-            else if (attr.key === 'credits') this.player.stats[attr.key] = 0;
+            if (['gpa','suTuo','labor', 'money', 'credits'].includes(attr.key)) this.player.stats[attr.key] = 0;
             else this.player.stats[attr.key] = this.player.personality.statsModifier;
         });
 
@@ -93,8 +91,8 @@ const GameState = {
 
         // 开学：选课 & 生活费
         if (isStartOfSemester) {
-            this.player.stats.money += 2000;
-            this.addLog("💰 获得生活费 2000元。");
+            this.player.stats.money += this.player.personality.regularMoney;
+            this.addLog(`💰 获得生活费 ${this.player.personality.regularMoney}元。`);
 
             // 智能推荐学分： (总需 - 已修) / 剩余学期数
             const remainingCredits = Math.max(0, this.player.difficulty.reqCredits - this.player.academics.totalCredits);
