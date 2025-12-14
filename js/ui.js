@@ -50,16 +50,6 @@ const UI = {
             let valText = typeof val === 'number' && !Number.isInteger(val) ? val.toFixed(1) : val;
             let barHtml = '';
 
-            // GPA 特殊处理：显示预测
-            if (attr.key === 'gpa') {
-                // 如果当前正在分配精力，显示预测值
-                const pendingStudy = this._tempStudyInput || 0; // 从临时变量获取
-                if (document.getElementById('inp-study')) {
-                     const pred = GameState.getGPAPrediction(pendingStudy);
-                     valText += ` <span style="font-size:10px; color:#64748b">(预期 ${pred.min.toFixed(1)}-${pred.max.toFixed(1)})</span>`;
-                }
-            }
-
             if (attr.max) {
                 const percent = GameState.getStatPercent(attr.key);
                 let color = 'var(--primary)';
@@ -139,7 +129,7 @@ const UI = {
                 if (!met) canStart = false;
                 const attrName = GameData.attributes.find(a=>a.key===k).name;
                 // 红色代表未满足，绿色代表满足
-                reqHtml += `<span class="req-tag ${met?'green':'red'}">${attrName}: ${myVal.toFixed(0)}/${needVal}</span>`;
+                reqHtml += `<span class="req-tag ${met?'green':'red'}">${attrName}: ${myVal.toFixed(1)}/${needVal}</span>`;
             }
 
             // 消耗描述
@@ -337,8 +327,13 @@ const UI = {
             </div>
 
             <!-- 预览区 -->
-            <div id="energy-preview" style="background:#f8fafc; padding:12px; border-radius:8px; margin-bottom:20px; font-size:13px; color:#475569; min-height:40px;">
+            <div id="energy-preview" style="background:#f8fafc; padding:12px; border-radius:8px; margin-bottom:20px; font-size:13px; color:#475569;">
                 调整滑块查看效果...
+            </div>
+
+            <!-- GPA预测 -->
+            <div id="gpa-prediction" style="background:#f0f9ff; padding:10px; border-radius:6px; margin-bottom:20px; font-size:12px; color:#0369a1; border:1px solid #bae6fd;">
+                GPA预测: 调整学习投入查看...
             </div>
 
             <div id="slider-group"></div>
@@ -385,7 +380,7 @@ const UI = {
         for (let k in chg) {
             if (Math.abs(chg[k]) < 0.1) continue;
             const attr = GameData.attributes.find(a => a.key === k);
-            const val = chg[k] > 0 ? `+${chg[k].toFixed(1)}` : chg[k].toFixed(1);
+            const val = chg[k] > 0 ? `+${chg[k].toFixed(2)}` : chg[k].toFixed(2);
             const color = chg[k] > 0 ? 'var(--success)' : 'var(--danger)';
             descHtml.push(`<span style="margin-right:8px; white-space:nowrap">${attr.name} <b style="color:${color}">${val}</b></span>`);
         }
@@ -395,37 +390,15 @@ const UI = {
 
         document.getElementById('energy-preview').innerHTML = descHtml.join('') || "无明显变化";
 
-        // 更新左侧GPA预测 (将当前学习投入存入临时变量)
-        this._tempStudyInput = alloc.study;
-        this.renderSidebar(); // 局部刷新左侧
-    },
-
-    updateEnergySum: function() {
-        let sum = 0;
-        ['study','rest','social'].forEach(k => {
-            const v = parseInt(document.getElementById(`inp-${k}`).value);
-            sum += v;
-            document.getElementById(`val-${k}`).innerText = v;
-        });
-        const max = GameState.player.flags.energyMax;
-        const totalEl = document.getElementById('energy-total');
-        const warn = document.getElementById('energy-warning');
-
-        totalEl.innerText = `${sum} / ${max}`;
-        if (sum > max) {
-            totalEl.classList.add('text-danger');
-            warn.classList.remove('hidden');
-            warn.innerText = `⚠️ 精力透支 ${(sum-max)}点 (将扣除大量健康)`;
-        } else {
-            totalEl.classList.remove('text-danger');
-            warn.classList.add('hidden');
-        }
+        // 更新GPA预测
+        const pred = GameState.getGPAPrediction(alloc.study);
+        const gpaText = `预计本学期获得 GPA ${pred.semester.min.toFixed(1)}~${pred.semester.max.toFixed(1)}，总 GPA 变化为 ${pred.total.min.toFixed(1)}~${pred.total.max.toFixed(1)}`;
+        document.getElementById('gpa-prediction').innerHTML = gpaText;
     },
 
     submitEnergy: function() {
         const getVal = k => parseInt(document.getElementById(`inp-${k}`).value) || 0;
         GameState.confirmEnergy({ study: getVal('study'), rest: getVal('rest'), social: getVal('social') });
-        this._tempStudyInput = 0; // 重置
     },
 
      // === 事件卡片与结果弹窗 ===

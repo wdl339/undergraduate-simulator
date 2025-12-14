@@ -127,10 +127,10 @@ const GameState = {
         // 1. 收益
         changes.knowledge += (alloc.study / 20) * 0.45;
         changes.skills += (alloc.study / 20) * 0.45 * flags.skillBonus;
-        const restGain = (alloc.rest / 20) * 0.8;
+        const restGain = (alloc.rest - 20) / 20 * 0.8;
         changes.physHealth += restGain;
         changes.mentalHealth += restGain;
-        changes.social += (alloc.social / 20) * 0.5;
+        changes.social += (alloc.social - 20) / 20 * 0.5;
 
         // 2. 消耗与惩罚
         // 项目消耗
@@ -190,11 +190,26 @@ const GameState = {
 
     // === GPA 预测与计算 ===
 
-    // 获取GPA预测范围 {min, max, avg}
+    // 辅助函数：计算基础GPA
+    calculateBaseGPA: function(avgEffort, credits) {
+        // 知识分：满分3.0（20知识）
+        const knowledgeBase = this.player.stats.knowledge * 0.15;
+        // 努力分：
+        // 假设标准努力是 每学分2.5精力/每阶段
+        // 例如：20学分 -> 50精力/阶段 -> 努力分 3.0
+        const requiredEffortPerPhase = credits * 2.5;
+        let effortScore = 0;
+        if (requiredEffortPerPhase > 0) {
+            effortScore = (avgEffort / requiredEffortPerPhase) * 3.0;
+        }
+        return knowledgeBase + effortScore - 2.0;
+    },
+
+    // 获取GPA预测范围 {semester: {min, max, avg}, total: {min, max, avg}}
     getGPAPrediction: function(currentStudyInput) {
         const ac = this.player.academics;
         const credits = ac.currentSemesterCredits;
-        if (credits <= 0) return { min: 0, max: 0, avg: 0 };
+        if (credits <= 0) return { semester: { min: 0, max: 0, avg: 0 }, total: { min: 0, max: 0, avg: 0 } };
 
         // 假设当前阶段投入 currentStudyInput
         let projectedEffort = ac.studyEffortAcc;
@@ -208,41 +223,47 @@ const GameState = {
         // 防止除以0
         let avgEffort = projectedPhases > 0 ? (projectedEffort / projectedPhases) : 0;
 
-        // 核心公式：
-        // 知识分：满分3.0 (20知识)
-        const knowledgeBase = this.player.stats.knowledge * 0.15;
+        let baseGPA = this.calculateBaseGPA(avgEffort, credits);
+        // 随机浮动 +/- 0.2
+        const semesterMin = Math.max(0, Math.min(4.0, baseGPA - 0.2));
+        const semesterMax = Math.max(0, Math.min(4.0, baseGPA + 0.2));
+        const semesterAvg = Math.max(0, Math.min(4.0, baseGPA));
 
-        // 努力分：
-        // 假设标准努力是：每学分对应 2.5 精力/每阶段
-        // 例如 20学分 -> 每阶段投入 50 精力 -> 努力分 1.0 (满分)
-        const requiredEffortPerPhase = credits * 2.5;
-        let effortScore = 0;
-        if (requiredEffortPerPhase > 0) {
-            effortScore = (avgEffort / requiredEffortPerPhase) * 1.5; // 上限1.5
+        // 计算当前总GPA
+        let currentTotalScore = 0;
+        let currentTotalCredits = 0;
+        ac.courses.forEach(c => {
+            currentTotalScore += c.gp * c.credits;
+            currentTotalCredits += c.credits;
+        });
+
+        // 预测总GPA
+        const predictedTotalCredits = currentTotalCredits + credits;
+        if (predictedTotalCredits <= 0) {
+            return {
+                semester: { min: semesterMin, max: semesterMax, avg: semesterAvg },
+                total: { min: 0, max: 0, avg: 0 }
+            };
         }
 
-        let baseGPA = knowledgeBase + effortScore - 0.5;
-        // 随机浮动 +/- 0.6
+        const totalMin = (currentTotalScore + semesterMin * credits) / predictedTotalCredits;
+        const totalMax = (currentTotalScore + semesterMax * credits) / predictedTotalCredits;
+        const totalAvg = (currentTotalScore + semesterAvg * credits) / predictedTotalCredits;
+
         return {
-            min: Math.max(0, Math.min(4.0, baseGPA - 0.6)),
-            max: Math.max(0, Math.min(4.0, baseGPA + 0.6)),
-            avg: Math.max(0, Math.min(4.0, baseGPA))
+            semester: { min: semesterMin, max: semesterMax, avg: semesterAvg },
+            total: { min: Math.max(0, Math.min(4.0, totalMin)), max: Math.max(0, Math.min(4.0, totalMax)), avg: Math.max(0, Math.min(4.0, totalAvg)) }
         };
     },
 
     calculateSemesterGPA: function() {
-        // 不传参调用 getGPAPrediction 会使用当前的累积值（不含本回合，因为本回合已经结算进去了）
-        // 但这里我们需要最后一次结算
+        // 最后一次结算
         const ac = this.player.academics;
         // 平均努力
         let avgEffort = ac.classPhasesPassed > 0 ? (ac.studyEffortAcc / ac.classPhasesPassed) : 0;
 
-        const knowledgeBase = this.player.stats.knowledge * 0.15;
-        const requiredEffortPerPhase = ac.currentSemesterCredits * 2.5;
-        let effortScore = 0;
-        if (requiredEffortPerPhase > 0) effortScore = (avgEffort / requiredEffortPerPhase) * 1.5;
-
-        let finalGPA = knowledgeBase + effortScore - 0.5 + (Math.random() * 1.2 - 0.6); // -0.6 ~ +0.6
+        let baseGPA = this.calculateBaseGPA(avgEffort, ac.currentSemesterCredits);
+        let finalGPA = baseGPA + (Math.random() * 0.2 * 2 - 0.2); // -0.2 ~ +0.2
         finalGPA = parseFloat(Math.max(0, Math.min(4.0, finalGPA)).toFixed(2));
 
         // 记录
