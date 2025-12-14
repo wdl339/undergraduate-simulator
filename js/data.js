@@ -3,8 +3,8 @@
 const GameData = {
     difficulties: {
         normal: { id: "normal", name: "正常大学", reqCredits: 160, rankDiff: 0, reqRank: 0.15, quitGPA: 1.5 },
-    //     project985: { id: "project985", name: "985高校", reqCredits: 170, rankDiff: 0.3, reqRank: 0.30, quitGPA: 2.0 },
-    //     top2: { id: "top2", name: "清北学府", reqCredits: 180, rankDiff: 0.6, reqRank: 0.40, quitGPA: 2.5 },
+        project985: { id: "project985", name: "985高校", reqCredits: 180, rankDiff: 2, reqRank: 0.30, quitGPA: 2.0 },
+        top2: { id: "top2", name: "清北学府", reqCredits: 225, rankDiff: 4, reqRank: 0.40, quitGPA: 2.5 },
     },
     personalities: {
         average: { id: "average", name: "平平无奇", statsModifier: 10, regularMoney: 2000 },
@@ -56,12 +56,20 @@ const GameData = {
     },
     shopItems: [
         { id: 'book', name: '专业书籍', cost: 400, type: 'consumable', effect: { knowledge: 0.5 }, desc: "知识水平+0.5" },
+        { id: 'consulting', name: '心理咨询', cost: 800, type: 'consumable', effect: { mentalHealth: 1.5}, desc: "心理健康+1.5" },
         { id: 'gym_card', name: '羽毛球教学', cost: 900, type: 'consumable', effect: { physHealth: 3}, desc: "身体健康+3" },
-        { id: 'consulting', name: '心理咨询', cost: 800, type: 'consumable', effect: { mentalHealth: 2}, desc: "心理健康+2" },
-        { id: 'coffee_machine', name: '咖啡机', cost: 2000, type: 'permanent', effect: { energyMax: 20 }, desc: "精力上限+20 (永久, 限购1次)" },
+        { id: 'concert', name: '演唱会', cost: 1500, type: 'consumable', effect: { mentalHealth: 2, social: 1 }, desc: "心理健康+2，社交水平+1" },
+        { id: 'travel', name: '短途旅行', cost: 2000, type: 'consumable', effect: { mentalHealth: 2, physHealth: 1, skills: 1 }, desc: "心理健康+2，身体健康+1，技能水平+1" },
+        { id: 'coffee_machine', name: '咖啡机', cost: 2000, type: 'permanent', effect: { energyMax: 10 }, desc: "精力上限+10 (永久, 限购1次)" },
         { id: 'laptop', name: '高性能笔记本', cost: 3500, type: 'permanent', effect: { skillBonus: 0.15 }, desc: "技能水平的获取效率提升15% (永久, 限购1次)" }
     ],
     projects: [
+        {
+            id: 'club', name: '社团活动', duration: 2,
+            req: { social: 9 },
+            costPerTurn: { physHealth: 0.5, money: 250, knowledge: 0.3 },
+            reward: { social: 1, mentalHealth: 1, knowledge: 0.6, labor: 2 }
+        },
         {
             id: 'competition', name: '学科竞赛', duration: 3,
             req: { knowledge: 12, skills: 12 },
@@ -72,17 +80,17 @@ const GameData = {
             id: 'research', name: '进组科研', duration: 4,
             req: { knowledge: 15, gpa: 3.6 },
             costPerTurn: { physHealth: 1, mentalHealth: 1 },
-            reward: { knowledge: 4, skills: 2, suTuo: 3 }
+            reward: { knowledge: 4, suTuo: 3 }
         },
         {
             id: 'dating', name: '谈恋爱', duration: 5,
             req: { social: 12, money: 3000 },
-            costPerTurn: { money: 500 },
-            reward: { mentalHealth: 5, social: 5, physHealth: 1 }
+            costPerTurn: { money: 400, skills: 0.25, knowledge: 0.25 },
+            reward: { mentalHealth: 4, social: 5, physHealth: 1 }
         },
         {
             id: 'internship', name: '大厂实习', duration: 4,
-            req: { social: 8, skills: 10 },
+            req: { social: 8, skills: 13 },
             costPerTurn: { physHealth: 1, mentalHealth: 0.5, social: 0.5 },
             reward: { money: 3000, skills: 3, mentalHealth: 2 }
         }

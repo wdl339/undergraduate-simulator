@@ -290,8 +290,8 @@ const GameState = {
     rankAndScholarship: function() {
         const diff = this.player.difficulty.rankDiff;
         const playerScore = this.player.stats.gpa * 9 + this.player.stats.suTuo * 5;
-        let baseRank = 100 - (playerScore * 2);
-        baseRank += (diff * 20);
+        let baseRank = Math.max(100 - (playerScore * 2), 0);
+        baseRank += diff;
         baseRank = Math.max(1, Math.min(99, baseRank + (Math.random() * 3 * 2 - 3)));
 
         this.player.rank = Math.floor(baseRank);
