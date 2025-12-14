@@ -20,10 +20,12 @@ const GameData = {
         { key: "money", name: "钱包余额", icon: "💰", max: null, category: "basic" },
 
         // 学业属性
-        { key: "gpa", name: "GPA", icon: "💯", max: 4.0, category: "academic" },
+        { key: "gpa", name: "GPA", icon: "💯", max: 4.0, category: "academic",
+            desc: "GPA = ∑（课程学分绩点 × 取得的课程学分）/ ∑修读课程学分，绩点与知识水平和投入学习的精力相关，GPA 过低将会被退学" },
         { key: "credits", name: "已修学分", icon: "🎓", max: null, category: "academic" }, // max将在逻辑中动态获取
         { key: "labor", name: "劳动学时", icon: "🧹", max: 20, category: "academic" },
-        { key: "suTuo", name: "素拓分数", icon: "🌟", max: null, category: "academic" },
+        { key: "suTuo", name: "素拓分数", icon: "🌟", max: null, category: "academic",
+            desc: "评奖学金的标准之一，每学年初始重置为0" }
     ],
     timeStructure: {
         totalPhases: 32,

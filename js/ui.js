@@ -39,7 +39,7 @@ const UI = {
         this.renderProjectBar();
     },
 
-     renderSidebar: function() {
+    renderSidebar: function() {
         // 1. 修复 Bug：更新文字显示
         document.getElementById('display-difficulty').innerText = GameState.player.difficulty.name;
         document.getElementById('display-personality').innerText = GameState.player.personality.name;
@@ -64,7 +64,7 @@ const UI = {
                         <div class="attr-info">
                             <span class="attr-icon">${attr.icon}</span>
                             <span>${attr.name}</span>
-                            <button class="btn-help" onclick="UI.showAttrDetail('${attr.key}')">?</button>
+                            ${attr.desc ? `<button class="btn-help" onclick="UI.showAttrDetail('${attr.key}')">?</button>` : ''}
                         </div>
                         <span class="attr-val">${valText}</span>
                     </div>
@@ -84,7 +84,7 @@ const UI = {
             <div class="attr-item">
                 <div class="attr-top">
                     <div class="attr-info"><span class="attr-icon">🎓</span><span>毕业学分</span></div>
-                    <span class="attr-val" style="color:var(--primary)">${creds} / ${reqCreds}</span>
+                    <span class="attr-val">${creds} / ${reqCreds}</span>
                 </div>
                 <div class="progress-bg"><div class="progress-fill" style="width: ${credPercent}%; background-color: var(--primary)"></div></div>
             </div>
