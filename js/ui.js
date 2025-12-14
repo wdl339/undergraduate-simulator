@@ -347,8 +347,9 @@ const UI = {
         container.appendChild(div);
 
         const sliders = [
-            {id:'study', name:'学习', val:40}, {id:'rest', name:'休息', val:30},
-            {id:'intern', name:'实习', val:10}, {id:'social', name:'社交', val:20}
+            {id:'study', name:'学习', val:50},
+            {id:'rest', name:'休息', val:30},
+            {id:'social', name:'社交', val:20}
         ];
 
         sliders.forEach(s => {
@@ -364,7 +365,7 @@ const UI = {
 
     updateEnergyPreview: function() {
         const getVal = k => parseInt(document.getElementById(`inp-${k}`).value) || 0;
-        const alloc = { study: getVal('study'), rest: getVal('rest'), intern: getVal('intern'), social: getVal('social') };
+        const alloc = { study: getVal('study'), rest: getVal('rest'), social: getVal('social') };
 
         // 更新滑块数字
         for(let k in alloc) document.getElementById(`val-${k}`).innerText = alloc[k];
@@ -401,7 +402,7 @@ const UI = {
 
     updateEnergySum: function() {
         let sum = 0;
-        ['study','rest','intern','social'].forEach(k => {
+        ['study','rest','social'].forEach(k => {
             const v = parseInt(document.getElementById(`inp-${k}`).value);
             sum += v;
             document.getElementById(`val-${k}`).innerText = v;
@@ -423,7 +424,7 @@ const UI = {
 
     submitEnergy: function() {
         const getVal = k => parseInt(document.getElementById(`inp-${k}`).value) || 0;
-        GameState.confirmEnergy({ study: getVal('study'), rest: getVal('rest'), intern: getVal('intern'), social: getVal('social') });
+        GameState.confirmEnergy({ study: getVal('study'), rest: getVal('rest'), social: getVal('social') });
         this._tempStudyInput = 0; // 重置
     },
 

@@ -8,16 +8,16 @@ const GameState = {
         academics: {
             currentSemesterCredits: 0,
             totalCredits: 0,
-            courses: [],
+            courses: [], // 记录每学期的课程成绩 {credits, gp}
             studyEffortAcc: 0, // 本学期累积学习精力
             classPhasesPassed: 0 // 本学期已经过的上课阶段数
         },
-        time: { phaseIdx: 0, year: 1, semester: 1, isHoliday: false },
+        time: { phaseIdx: 0, year: 1, semester: 1, isClass: true },
         logs: [],
         flags: { energyMax: 100, skillBonus: 1.0, boughtItems: [] },
         activeProject: null,
         currentGoal: 'gradSchool',
-        consecutiveBankrupt: 0,
+        consecutiveBankrupt: 0, // 连续欠费回合数
         rank: 100
     },
 
@@ -32,7 +32,7 @@ const GameState = {
         // 重置
         this.player.stats = {};
         this.player.academics = { currentSemesterCredits: 0, totalCredits: 0, courses: [], studyEffortAcc: 0, classPhasesPassed: 0 };
-        this.player.time = { phaseIdx: -1, year: 1, semester: 1, isHoliday: false };
+        this.player.time = { phaseIdx: -1, year: 1, semester: 1, isClass: true };
         this.player.logs = [];
         this.player.flags = { energyMax: 100, skillBonus: 1.0, boughtItems: [] };
         this.player.activeProject = null;
@@ -65,7 +65,7 @@ const GameState = {
         this.player.time.semester = phaseInYear < 4 ? 1 : 2;
 
         const subPhaseObj = GameData.timeStructure.subPhases[phaseInYear];
-        this.player.time.isHoliday = !subPhaseObj.isClass;
+        this.player.time.isClass = subPhaseObj.isClass;
 
         // 新学期/新学年 初始化
         if (phaseInYear === 0 || phaseInYear === 4) {
@@ -125,11 +125,8 @@ const GameState = {
         let warnings = [];
 
         // 1. 收益
-        changes.knowledge += (alloc.study / 20) * 0.5;
-        changes.skills += (alloc.intern / 20) * 0.5 * flags.skillBonus;
-        if (alloc.intern > 30) {
-             changes.money += 300;
-        }
+        changes.knowledge += (alloc.study / 20) * 0.45;
+        changes.skills += (alloc.study / 20) * 0.45 * flags.skillBonus;
         const restGain = (alloc.rest / 20) * 0.8;
         changes.physHealth += restGain;
         changes.mentalHealth += restGain;
@@ -146,12 +143,12 @@ const GameState = {
         }
 
         // 溢出惩罚
-        let total = alloc.study + alloc.rest + alloc.intern + alloc.social;
+        let total = alloc.study + alloc.rest + alloc.social;
         let overflow = Math.max(0, total - flags.energyMax);
         if (overflow > 0) {
             let penalty = overflow / 10;
-            changes.physHealth -= penalty;
-            changes.mentalHealth -= penalty * 0.5;
+            changes.physHealth -= penalty * 1.1;
+            changes.mentalHealth -= penalty * 0.8;
             warnings.push(`精力透支 ${overflow}%, 健康大幅受损`);
         }
 
@@ -179,13 +176,10 @@ const GameState = {
         }
 
         // 记录本学期学习精力 (仅当是非假期时)
-        if (!this.player.time.isHoliday) {
+        if (this.player.time.isClass) {
             this.player.academics.studyEffortAcc += alloc.study;
             this.player.academics.classPhasesPassed++;
         }
-
-        // 增加劳动学时 (实际逻辑)
-        if (alloc.intern > 30) this.player.stats.labor += 1;
 
         if (preview.warnings.length > 0) {
             this.addLog(`⚠️ ${preview.warnings.join('; ')}`);
@@ -206,7 +200,7 @@ const GameState = {
         let projectedEffort = ac.studyEffortAcc;
         let projectedPhases = ac.classPhasesPassed;
 
-        if (!this.player.time.isHoliday) {
+        if (this.player.time.isClass) {
             projectedEffort += currentStudyInput;
             projectedPhases += 1;
         }
