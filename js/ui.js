@@ -114,7 +114,7 @@ const UI = {
     // 显示项目 (带条件检查)
     showProjectModal: function() {
         if (GameState.player.activeProject) {
-            this.openModal("提示", "<p>你当前已有正在进行的项目，请先完成后再开启新的。</p>");
+            this.openModal("提示", "<p>你当前已有正在进行的项目，请先完成后再开启新的</p>");
             return;
         }
 
@@ -295,7 +295,7 @@ const UI = {
                 <div style="text-align:center; margin-top:60px; color:#94a3b8">
                     <div style="font-size:48px; margin-bottom:20px">☕</div>
                     <h3>本阶段事务已处理完毕</h3>
-                    <p>你可以逛逛超市，或者直接进入下一阶段</p>
+                    <p>你可以开启项目，逛逛超市，或者直接进入下一阶段</p>
                 </div>
             `;
             return;
@@ -308,9 +308,9 @@ const UI = {
         if (tasks.includes('final_exam')) {
             container.innerHTML = `
             <div class="card">
-                <h3>📝 期末考试</h3>
-                <p style="margin-bottom:20px; color:#64748b">一学期的努力将在今天验证。</p>
-                <button class="btn-primary" onclick="GameState.calculateSemesterGPA()">开始考试</button>
+                <h3>📝 考试周</h3>
+                <p style="margin-bottom:20px; color:#64748b">一学期的努力将于现在验证</p>
+                <button class="btn-primary" onclick="GameState.calculateSemesterGPA()">结算本学期GPA</button>
             </div>`;
             return;
         }

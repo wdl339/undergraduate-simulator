@@ -44,7 +44,7 @@ const GameState = {
             else this.player.stats[attr.key] = this.player.personality.statsModifier;
         });
 
-        this.addLog("🎉 欢迎入学！请在右侧设置你的毕业目标。");
+        this.addLog("🎉 欢迎入学！请在右侧设置你的毕业目标");
         this.nextPhase();
     },
 
@@ -76,7 +76,7 @@ const GameState = {
         if (phaseInYear === 0 && this.player.time.year > 1) {
             this.rankAndScholarship();
             this.player.stats.suTuo = 0;
-            this.addLog(`📅 新学年开始，素拓分已重置。`);
+            this.addLog(`📅 新学年开始，素拓分已重置`);
         }
 
         this.processActiveProject();
@@ -92,7 +92,7 @@ const GameState = {
         // 开学：选课 & 生活费
         if (isStartOfSemester) {
             this.player.stats.money += this.player.personality.regularMoney;
-            this.addLog(`💰 获得生活费 ${this.player.personality.regularMoney} 元。`);
+            this.addLog(`💰 获得生活费 ${this.player.personality.regularMoney} 元`);
 
             // 智能推荐学分： (总需 - 已修) / 剩余学期数
             const remainingCredits = Math.max(0, this.player.difficulty.reqCredits - this.player.academics.totalCredits);
@@ -312,8 +312,12 @@ const GameState = {
 
     resolveEvent: function(eff) {
         let changes = {};
-        for(let k in eff) {
-            this.applyChange(changes, k, eff[k]);
+        let actualEff = eff;
+        if (Array.isArray(eff)) {
+            actualEff = eff[Math.floor(Math.random() * eff.length)];
+        }
+        for(let k in actualEff) {
+            this.applyChange(changes, k, actualEff[k]);
         }
         this.completeTask('random_event');
         return changes; // 返回变动给UI显示

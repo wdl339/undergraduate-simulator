@@ -115,9 +115,9 @@ const GameData = {
     ],
     events: [
         {
-            text: "室友邀请你通宵开黑，你决定：",
+            text: "室友邀请你通宵打游戏，你决定：",
             options: [
-                { text: "加入他们", effect: { social: 2, physHealth: -2, knowledge: -0.5 } },
+                { text: "加入他们", effect: [ { social: 2, physHealth: -2 }, { knowledge: -0.5 } ] },
                 { text: "拒绝并睡觉", effect: { mentalHealth: -0.5, physHealth: 1 } },
                 { text: "起来卷高数", effect: { knowledge: 1, physHealth: -1, social: -1 } }
             ]
