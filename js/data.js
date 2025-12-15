@@ -159,7 +159,8 @@ const GameData = {
             options: [
                 { text: "TA怎么会是这种人！", effect: [ { social: 1 }, { mentalHealth: -0.5 } ] },
                 { text: "原来他是这种人！", effect: [ { social: -1 }, { mentalHealth: 0.5 } ] },
-                { text: "怎么不和我风流？", effect: [ { social: 0.5 }, { mentalHealth: -0.5 } ] }
+                { text: "怎么不和我风流？", effect: [ { social: 0.5 }, { mentalHealth: -0.5 } ] },
+                { text: "趁机售卖一手吃瓜资料", effect: { money: 300 } }
             ]
         },
         {
@@ -190,9 +191,25 @@ const GameData = {
             ]
         },
         {
+            text: "你发现一个巨大的商机：",
+            options: [
+                { text: "创业！", effect: [{ money: 800 }, {money: 200}, {money: -100}] },
+                { text: "当心泡沫", effect: {} }
+            ]
+        },
+        {
+            text: "你经营发的小红书帖子忽然爆火了：",
+            options: [
+                { text: "认真经营", effect: [{ money: 300 }, {knowledge: -2, skills: 1}] },
+                { text: "趁热打铁，开始带货", effect: [{ money: 1000 }, {money: 400}, {social: -1}] },
+                { text: "和学校官方合作作品", effect: [{ labor: 2 }, { suTuo: 0.5 }] },
+                { text: "低调做人", effect: {} }
+            ]
+        },
+        {
             text: "在路上捡到一张校园卡：",
             options: [
-                { text: "想办法还给失主", effect: [{ social: 1, suTuo: 0.3 }, { money: 100 }] },
+                { text: "想办法还给失主", effect: [{ social: 1, suTuo: 0.3 }, { money: 200 }] },
                 { text: "不管它", effect: {} }
             ]
         }
