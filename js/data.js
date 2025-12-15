@@ -134,6 +134,43 @@ const GameData = {
             options: [
                 { text: "当然要报名", effect: [ { labor: 3 }, { suTuo: 0.3 } ] },
                 { text: "学习更重要", effect: { knowledge: 0.1} },
+                { text: "真的自愿吗？我看未必", effect: {social: -1} }
+            ]
+        },
+        {
+            text: "你误入了一个果聊群，群主告诉你刷单可以获取聊天次数。你正欲报警，对方暗示他手里有你的果照：",
+            options: [
+                { text: "坚持报警", effect: [ { mentalHealth: -2 }, { mentalHealth: 1 } ] },
+                { text: "帮他刷单", effect: [ { money: -300 }, { mentalHealth: -1 } ] },
+                { text: "身正不怕影子斜，你这照片肯定是P的", effect: [{ mentalHealth: 2 }, {social: -4, mentalHealth: -1}] },
+                { text: "沉迷聊天", effect: { physHealth: -2 } }
+            ]
+        },
+        {
+            text: "自习室外下起了大雨，你正好没有带伞：",
+            options: [
+                { text: "冒雨回宿舍", effect: [ { physHealth: -1 }, { mentalHealth: 1 } ] },
+                { text: "向朋友求助", effect: { social: 1 } },
+                { text: "继续学习，等雨停", effect: { mentalHealth: -1, knowledge: 0.2 } }
+            ]
+        },
+        {
+            text: "有人在校园论坛发帖，曝光了你某个异性朋友的风流逸事：",
+            options: [
+                { text: "TA怎么会是这种人！", effect: [ { social: 1 }, { mentalHealth: -0.5 } ] },
+                { text: "原来他是这种人！", effect: [ { social: -1 }, { mentalHealth: 0.5 } ] },
+                { text: "怎么不和我风流？", effect: [ { social: 0.5 }, { mentalHealth: -0.5 } ] }
+            ]
+        },
+        {
+            text: "亲戚在相亲相爱一家人群里问你为啥还不找对象：",
+            options: [
+                { text: "沉迷学习导致的", effect: [ { knowledge: 0.5 }, { social: -1 } ] },
+                { text: "那你给我介绍一个？", effect: [ { social: 1 }, { mentalHealth: 0.5 } ] },
+                { text: "我丁克", effect: { social: -1 } },
+                { text: "彩礼钱你出呗", effect: { money: 500 } },
+                { text: "我更喜欢同性", effect: { social: -2 } },
+                { text: "我都是短择的，随便玩玩", effect: { mentalHealth: 1, social: 1 } }
             ]
         },
         {
