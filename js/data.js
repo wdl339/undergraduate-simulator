@@ -115,24 +115,47 @@ const GameData = {
     ],
     events: [
         {
+            text: "某门课程的安排不合理，作业量太大，同学们怨声载道。有同学在课程群里直接表达不满：",
+            options: [
+                { text: "跟风起哄", effect: [ { social: 1, mentalHealth: 2 }, { knowledge: -0.5 } ] },
+                { text: "静观其变", effect: { knowledge: -0.5 } },
+                { text: "替老师说好话", effect: [{ knowledge: 1, social: -6 }, { social: 1 }] }
+            ]
+        },
+        {
+            text: "你发现了竞争对手伪造志愿时长的证据：",
+            options: [
+                { text: "直接举报！", effect: [ { mentalHealth: 2 }, { social: -0.5 }, { suTuo: 0.3 } ] },
+                { text: "向他学习", effect: [{ skills: 0.5 }, {suTuo: -0.5}] },
+            ]
+        },
+        {
+            text: "学院组织同学们开展义务劳动，自愿报名：",
+            options: [
+                { text: "当然要报名", effect: [ { labor: 3 }, { suTuo: 0.3 } ] },
+                { text: "学习更重要", effect: { knowledge: 0.1} },
+            ]
+        },
+        {
             text: "室友邀请你通宵打游戏，你决定：",
             options: [
-                { text: "加入他们", effect: [ { social: 2, physHealth: -2 }, { knowledge: -0.5 } ] },
-                { text: "拒绝并睡觉", effect: { mentalHealth: -0.5, physHealth: 1 } },
+                { text: "加入他们", effect: [ { social: 2, physHealth: -2 }, { physHealth: -1, knowledge: -0.5 } ] },
+                { text: "拒绝并睡觉", effect: { social: -1, physHealth: 1 } },
                 { text: "起来卷高数", effect: { knowledge: 1, physHealth: -1, social: -1 } }
             ]
         },
         {
-            text: "突发流感，你感觉喉咙不舒服：",
+            text: "突发流感，身边的同学陆续中招，你也感觉喉咙不舒服：",
             options: [
-                { text: "立刻去校医院", effect: { money: -300, physHealth: 2 } },
-                { text: "硬抗", effect: { physHealth: -3, mentalHealth: -1 } }
+                { text: "去校医院", effect: { money: -100 } },
+                { text: "去附近的三甲医院", effect: { money: -300, physHealth: 1.5 } },
+                { text: "硬抗", effect: { physHealth: -3 } }
             ]
         },
         {
-            text: "路上捡到一张校园卡：",
+            text: "在路上捡到一张校园卡：",
             options: [
-                { text: "想办法还给失主", effect: { social: 1, suTuo: 0.5 } },
+                { text: "想办法还给失主", effect: [{ social: 1, suTuo: 0.3 }, { money: 100 }] },
                 { text: "不管它", effect: {} }
             ]
         }
