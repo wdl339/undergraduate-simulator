@@ -118,7 +118,7 @@ const UI = {
             return;
         }
 
-        const html = GameData.projects.map(p => {
+        const html = `<div style="width: 800px;"><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">${GameData.projects.map(p => {
             // 检查条件
             let reqHtml = '';
             let canStart = true;
@@ -146,7 +146,7 @@ const UI = {
 
             return `
                 <div class="list-item">
-                    <div class="list-item-left">
+                    <div class="list-item-left" style="text-align: left;">
                         <strong>${p.name} <span style="font-size:12px; font-weight:normal; color:#999">持续${p.duration}阶段</span></strong>
                         <div style="margin:5px 0">${reqHtml}</div>
                         <p>每阶段消耗: ${costDesc}</p>
@@ -159,7 +159,7 @@ const UI = {
                     </button>
                 </div>
             `;
-        }).join('');
+        }).join('')}</div></div>`;
 
         this.openModal("选择短期项目", html);
     },

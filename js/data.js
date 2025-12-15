@@ -3,12 +3,12 @@
 const GameData = {
     difficulties: {
         normal: { id: "normal", name: "正常大学", reqCredits: 160, rankDiff: 0, reqRank: 0.15, quitGPA: 1.5 },
-        project985: { id: "project985", name: "985高校", reqCredits: 180, rankDiff: 2, reqRank: 0.30, quitGPA: 2.0 },
-        top2: { id: "top2", name: "清北学府", reqCredits: 225, rankDiff: 4, reqRank: 0.40, quitGPA: 2.5 },
+        project985: { id: "project985", name: "985高校", reqCredits: 200, rankDiff: 2, reqRank: 0.30, quitGPA: 2.0 },
+        top2: { id: "top2", name: "清北学府", reqCredits: 240, rankDiff: 4, reqRank: 0.40, quitGPA: 2.5 },
     },
     personalities: {
         average: { id: "average", name: "平平无奇", statsModifier: 10, regularMoney: 2000 },
-        gifted: { id: "gifted", name: "天赋异禀", statsModifier: 15, regularMoney: 2000 },
+        gifted: { id: "gifted", name: "天赋异禀", statsModifier: 14, regularMoney: 2000 },
         frail: { id: "frail", name: "弱不禁风", statsModifier: 5, regularMoney: 2000 },
     },
     attributes: [
@@ -55,7 +55,7 @@ const GameData = {
         }
     },
     shopItems: [
-        { id: 'book', name: '专业书籍', cost: 400, type: 'consumable', effect: { knowledge: 0.5 }, desc: "知识水平+0.5" },
+        { id: 'book', name: '专业书籍', cost: 500, type: 'consumable', effect: { knowledge: 0.5 }, desc: "知识水平+0.5" },
         { id: 'consulting', name: '心理咨询', cost: 800, type: 'consumable', effect: { mentalHealth: 1.5}, desc: "心理健康+1.5" },
         { id: 'gym_card', name: '羽毛球教学', cost: 900, type: 'consumable', effect: { physHealth: 3}, desc: "身体健康+3" },
         { id: 'concert', name: '演唱会', cost: 1500, type: 'consumable', effect: { mentalHealth: 2, social: 1 }, desc: "心理健康+2，社交水平+1" },
@@ -68,7 +68,13 @@ const GameData = {
             id: 'club', name: '社团活动', duration: 2,
             req: { social: 9 },
             costPerTurn: { physHealth: 0.5, money: 250, knowledge: 0.3 },
-            reward: { social: 1, mentalHealth: 1, knowledge: 0.6, labor: 2 }
+            reward: { social: 1, mentalHealth: 1, knowledge: 0.6, labor: 3 }
+        },
+        {
+            id: 'volunteer', name: '志愿服务', duration: 2,
+            req: { skills: 9 },
+            costPerTurn: { physHealth: 1, },
+            reward: { mentalHealth: 1.5, labor: 4, suTuo: 1  }
         },
         {
             id: 'competition', name: '学科竞赛', duration: 3,
@@ -77,22 +83,34 @@ const GameData = {
             reward: { suTuo: 2, skills: 2, knowledge: 2, labor: 5 }
         },
         {
+            id: 'work', name: '勤工俭学', duration: 3,
+            req: { skills: 12, mentalHealth: 10 },
+            costPerTurn: { physHealth: 0.5, social: 0.5 },
+            reward: { skills: 1.5, labor: 6 }
+        },
+        {
             id: 'research', name: '进组科研', duration: 4,
             req: { knowledge: 15, gpa: 3.6 },
             costPerTurn: { physHealth: 1, mentalHealth: 1 },
-            reward: { knowledge: 4, suTuo: 3 }
-        },
-        {
-            id: 'dating', name: '谈恋爱', duration: 5,
-            req: { social: 12, money: 3000 },
-            costPerTurn: { money: 400, skills: 0.25, knowledge: 0.25 },
-            reward: { mentalHealth: 4, social: 5, physHealth: 1 }
+            reward: { knowledge: 3.5, suTuo: 3 }
         },
         {
             id: 'internship', name: '大厂实习', duration: 4,
             req: { social: 8, skills: 13 },
             costPerTurn: { physHealth: 1, mentalHealth: 0.5, social: 0.5 },
             reward: { money: 3000, skills: 3, mentalHealth: 2 }
+        },
+        {
+            id: 'exchange', name: '出国交换', duration: 4,
+            req: { gpa: 3.7, money: 3000 },
+            costPerTurn: { money: 500 },
+            reward: { knowledge: 3, social: 2, mentalHealth: 2 }
+        },
+        {
+            id: 'dating', name: '谈恋爱', duration: 5,
+            req: { social: 12, money: 3000 },
+            costPerTurn: { money: 400, skills: 0.25, knowledge: 0.25 },
+            reward: { mentalHealth: 4, social: 5, physHealth: 1 }
         }
     ],
     events: [

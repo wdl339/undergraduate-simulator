@@ -298,11 +298,11 @@ const GameState = {
         this.addLog(`🏆 奖学金评选：你的综合排名位于前 ${this.player.rank}%`);
 
         if (this.player.rank <= 5) {
-            this.addLog("🥇 获得【国家奖学金】！(奖金5000，社交+2)");
+            this.addLog("🥇 获得【国家奖学金】！奖金5000，社交+2");
             this.applyChange({}, 'money', 5000);
             this.applyChange({}, 'social', 2);
         } else if (this.player.rank <= 20) {
-            this.addLog("🥈 获得【优秀奖学金】！(奖金1000，社交+1)");
+            this.addLog("🥈 获得【优秀奖学金】！奖金1000，社交+1");
             this.applyChange({}, 'money', 1000);
             this.applyChange({}, 'social', 1);
         }
@@ -405,10 +405,10 @@ const GameState = {
 
     checkBadEndings: function() {
         const s = this.player.stats;
-        if (s.money < 0) this.player.consecutiveBankrupt++;
+        if (s.money <= 0) this.player.consecutiveBankrupt++;
         else this.player.consecutiveBankrupt = 0;
 
-        if (this.player.consecutiveBankrupt >= 3) return this.triggerEnding('bankrupt');
+        if (this.player.consecutiveBankrupt >= 2) return this.triggerEnding('bankrupt');
         if (s.gpa > 0 && s.gpa < this.player.difficulty.quitGPA && this.player.time.phaseIdx > 8) return this.triggerEnding('dropout');
         if (s.mentalHealth <= 0) return this.triggerEnding('suicide');
         if (s.physHealth <= 0) return this.triggerEnding('death');
